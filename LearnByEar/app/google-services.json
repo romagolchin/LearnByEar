@@ -1,29 +1,25 @@
 {
   "project_info": {
-    "project_number": "694662298619",
-    "firebase_url": "https://learnbyear-cd5b9.firebaseio.com",
-    "project_id": "learnbyear-cd5b9",
-    "storage_bucket": "learnbyear-cd5b9.appspot.com"
+    "project_number": "699713534774",
+    "firebase_url": "https://learnbyear-be021.firebaseio.com",
+    "project_id": "learnbyear-be021",
+    "storage_bucket": "learnbyear-be021.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:694662298619:android:7615f7ff2d2bb04c",
+        "mobilesdk_app_id": "1:699713534774:android:7615f7ff2d2bb04c",
         "android_client_info": {
           "package_name": "olegkuro.learnbyear"
         }
       },
       "oauth_client": [
         {
-          "client_id": "694662298619-au45pillab4298v1vtvdgta7eqvhmp33.apps.googleusercontent.com",
+          "client_id": "699713534774-jm4pu6712c30vkoejrs3oidc0qbbh920.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDpHg0rBwVoZ-qp2TxXvq-CFHAYgaa4gn4"
-        }
-      ],
+      "api_key": [],
       "services": {
         "analytics_service": {
           "status": 1
