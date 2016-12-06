@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">LearnByEar</string>
+    <string name="app_name">LearnByEar</string>'
+    <string name="action_settings">action settings</string>
+    <string name="action_item1">Language</string>
+    <string name="action_item2">Authors</string>
+    <string name="action_item3">Exit</string>
+    <string name="search">Search song</string>
 </resources>
