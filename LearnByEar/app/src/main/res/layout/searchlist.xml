@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bckgr">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Input here"
+        android:paddingLeft="13dp"
+        android:layout_margin="2dp"
+        android:id="@+id/request"
+        android:layout_marginRight="15dp"
+        android:layout_toLeftOf="@+id/start_search"
+        android:layout_alignParentLeft="true"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/start_search"
+        android:layout_marginLeft="15dp"
+        android:layout_alignParentRight="true"
+        android:text="Go!"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button_bckgr_gradient"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv"
+        android:layout_below="@id/start_search">
+
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_bottom_bar"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="5dip"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_up"
+            android:gravity="center"
+            android:padding="5dip"
+            android:text="At the begin"
+            android:background="@drawable/button_bckgr_gradient"/>
+
+    </LinearLayout>
+</RelativeLayout>
