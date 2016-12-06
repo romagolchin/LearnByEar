@@ -32,8 +32,14 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+
         //TODO menu event handlers
         //Change Language
+        //if you'd like u may change if -> switch
+        if (id == R.id.search_song){
+            return true; //poisk pesni sobsna
+        }
+
         if (id == R.id.action_item1){
             return true;
         }
