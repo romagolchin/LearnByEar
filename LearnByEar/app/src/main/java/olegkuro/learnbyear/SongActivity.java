@@ -18,4 +18,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 public class SongActivity extends Activity {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.song_view_layout);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putAll(putsmth);
+    }
 }

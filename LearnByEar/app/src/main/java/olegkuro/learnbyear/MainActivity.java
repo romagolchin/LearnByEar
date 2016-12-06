@@ -3,6 +3,7 @@ package olegkuro.learnbyear;
 //import android.support.v7.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +38,8 @@ public class MainActivity extends Activity {
         //Change Language
         //if you'd like u may change if -> switch
         if (id == R.id.search_song){
+            Intent intent = new Intent(this, SongActivity.class);
+            startActivity(intent);
             return true; //poisk pesni sobsna
         }
 
