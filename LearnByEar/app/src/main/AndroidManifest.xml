@@ -15,6 +15,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <activity android:name=".SongActivity"
+            android:label="Song">
+
+        </activity>
+
+        <activity android:name=".SearchActivity"
+            android:label="Search">
+
         </activity>
         <meta-data xmlns:tools="http://schemas.android.com/tools"
             android:name="io.fabric.ApiKey"
@@ -22,6 +32,9 @@
             android:value="7416fc3d376d8870dfebd013e05e7505a7d80c5e"
             />
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
