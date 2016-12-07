@@ -23,7 +23,7 @@
         android:layout_alignParentRight="true"
         android:text="Go!"
         android:layout_marginRight="10dp"
-        android:background="@drawable/button_bckgr_gradient"/>
+        android:background="@drawable/mybutton"/>
 
     <ListView
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
             android:gravity="center"
             android:padding="5dip"
             android:text="At the begin"
-            android:background="@drawable/button_bckgr_gradient"/>
+            android:background="@drawable/mybutton"/>
 
     </LinearLayout>
 </RelativeLayout>
