@@ -22,6 +22,7 @@
         android:layout_marginLeft="15dp"
         android:layout_alignParentRight="true"
         android:text="Go!"
+        android:layout_marginRight="10dp"
         android:background="@drawable/button_bckgr_gradient"/>
 
     <ListView

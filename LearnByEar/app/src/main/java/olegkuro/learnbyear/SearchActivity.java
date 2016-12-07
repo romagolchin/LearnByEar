@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -20,12 +21,26 @@ public class SearchActivity extends Activity {
     private ListView listView;
     ArrayList<String> data;
     Button upButton;
+    Button searchButton;
+    EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchlist);
         listView = (ListView) findViewById(R.id.lv);
+        searchButton = (Button) findViewById(R.id.start_search);
+        searchButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                editText = (EditText) findViewById(R.id.request);
+                String request = editText.getText().toString();
+                data = doRequest(request);
+                fillList();
+            }
+        });
+
+        //simply turns back to the first item
         upButton = (Button) findViewById(R.id.button_up);
         upButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -33,9 +48,9 @@ public class SearchActivity extends Activity {
                 listView.setSelection(0);
             }
         });
-        //TODO: fillList(String[]);
 
         //possibly crashes
+        //click item list listener
         listView.setOnClickListener((View.OnClickListener) new DrawerItemClickListener());
     }
 
@@ -47,16 +62,17 @@ public class SearchActivity extends Activity {
 
     // songs - songlist
     //при каждом заполнении все данные сохраняются в data, чтобы при повороте экрана все восстановилось
-    protected void fillList(String[] songs){
-        data.clear();
-        for (String song : songs){
-            data.add(song);
-        }
+    protected void fillList(){
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.my_list_item, data);
         listView.setAdapter(adapter);
     }
 
+    private ArrayList<String> doRequest(String inp){
+        ArrayList<String> ret = null;
+        //ret = ...
+        return ret;
+    }
 
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener{
@@ -64,7 +80,7 @@ public class SearchActivity extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
             selectItem(position);
         }
-        //TODO add events showup SongActivity
+        //TODO each item should open new SongActivity
         private void selectItem(int position){
             switch (position) {
                 case 0: //0 item clicked
