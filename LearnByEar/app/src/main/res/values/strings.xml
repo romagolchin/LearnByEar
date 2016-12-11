@@ -5,6 +5,17 @@
     <string name="action_settings">action settings</string>
     <string name="action_item1">Language</string>
     <string name="action_item2">Authors</string>
+    <string name="login">Login</string>
     <string name="action_item3">Exit</string>
     <string name="search">Search song</string>
+
+    <string name="edit">Edit</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="error_no_network">No network</string>
+    <string name="message_signed_in">You are signed in!</string>
+    <string name="sign_out">Sign out</string>
+    <string name="delete_account">Delete account</string>
+    <string name="sign_out_fail">Sign out failed!</string>
+    <string name="del_account_fail">Account deletion failed!</string>
+
 </resources>

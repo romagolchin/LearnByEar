@@ -20,7 +20,7 @@
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:textSize="20dp"
@@ -29,7 +29,12 @@
                 android:layout_height="wrap_content"
                 android:text="Here we may add detalized info about song show ratings..."
                 />
-
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:id="@+id/edit_button"
+                android:layout_gravity="center_horizontal"/>
         </LinearLayout>
 
         <!-- scrolling bottom pane -->

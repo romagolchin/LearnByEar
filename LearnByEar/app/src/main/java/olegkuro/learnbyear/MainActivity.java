@@ -1,26 +1,17 @@
 package olegkuro.learnbyear;
 
-import android.app.Activity;
-
-//import android.support.v7.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.AppCompatActivity;
 
-import com.crashlytics.android.Crashlytics;
-
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by Елена on 29.11.2016.
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+//        startActivity(new Intent(this, SongActivity.class));
         setContentView(R.layout.main_layout);
     }
 
@@ -30,41 +21,6 @@ public class MainActivity extends Activity {
         //TODO put identifiers here
     }
 
-    public boolean onCreateOptionsMenu(Menu menu){
-        // adds menu items to the action bar if it presents
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-
-        //TODO menu event handlers
-        //Change Language
-        //if you'd like u may change if -> switch
-        if (id == R.id.search_song){
-            Intent intent = new Intent(this, SongActivity.class);
-            startActivity(intent);
-            return true; //poisk pesni sobsna
-        }
-
-        if (id == R.id.action_item1){
-            return true;
-        }
-
-        //show Authors
-        if (id == R.id.action_item2){
-            return true;
-        }
-
-        //Exit
-        if (id == R.id.action_item3){
-            return true;
-        }
-
-        //delete it later pls
-        return true;
-    }
 
 }
