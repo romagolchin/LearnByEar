@@ -6,11 +6,17 @@ import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 import java.io.IOException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import olegkuro.learnbyear.model.Lyrics;
 
@@ -37,10 +43,13 @@ public class HTMLLyricsParser {
                 String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
                 String url = builder.build().toString() + anchor;
                 Log.d(TAG + " request", url);
-//                WebDriver driver = new FirefoxDriver();
-//                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-//                driver.get(url);
-//                List<WebElement> links = driver.findElements(By.className("gs-per-result-labels"));
+                WebDriver driver = new FirefoxDriver();
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+                driver.get(url);
+                List<WebElement> links = driver.findElements(By.className("gs-per-result-labels"));
+                List<WebElement> headerElements = driver.findElements(By.className("gs-title"));
+                Log.d(TAG + " links size", String.valueOf(links.size()));
+                Log.d(TAG + " headerElements size", String.valueOf(headerElements.size()));
 //                Document doc = Jsoup.connect(url).get();
 //                String all = doc.html();
 //                System.out.println(all);
@@ -55,24 +64,24 @@ public class HTMLLyricsParser {
 //                Log.d(TAG, String.valueOf(headerElements.size()));
                 String songUrl;
                 boolean isLyricsUrl = false;
-//                for (int i = 0; i < links.size(); ++i) {
-//                    WebElement link = links.get(i);
-//                    songUrl = link.getAttribute("url");
+                for (int i = 0; i < links.size(); ++i) {
+                    WebElement link = links.get(i);
+                    songUrl = link.getAttribute("url");
                     // assume it's a page of a musician
-//                    if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
-//                        continue;
-//                    int cnt = 0;
-//                    String path = new URL(songUrl).getPath();
-//                    for (int j = 0; j < path.length(); ++j) {
-//                        char c = path.charAt(j);
-//                        if (c == '/')
-//                            ++cnt;
-//                    }
-//                    if (cnt != 1)
-//                        continue;
-//                    found = true;
-//                    searchResults.add(new SearchResult(headerElements.get(i).ownText(), new URL(songUrl)));
-//                }
+                    if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
+                        continue;
+                    int cnt = 0;
+                    String path = new URL(songUrl).getPath();
+                    for (int j = 0; j < path.length(); ++j) {
+                        char c = path.charAt(j);
+                        if (c == '/')
+                            ++cnt;
+                    }
+                    if (cnt != 1)
+                        continue;
+                    found = true;
+                    searchResults.add(new SearchResult(headerElements.get(i).getText(), new URL(songUrl)));
+                }
             } catch (Exception e) {
                 Log.d(TAG, "", e);
             }

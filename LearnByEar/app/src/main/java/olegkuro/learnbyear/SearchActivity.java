@@ -1,41 +1,70 @@
 package olegkuro.learnbyear;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.net.URL;
+import java.util.List;
+
+import butterknife.BindView;
+import olegkuro.learnbyear.loader.LoadResult;
+import olegkuro.learnbyear.loader.LyricsLoader;
+import olegkuro.learnbyear.loader.SearchResult;
 
 /**
  * Created by Елена on 07.12.2016.
  */
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends BaseActivity
+        implements LoaderManager.LoaderCallbacks<LoadResult<List<SearchResult>>> {
 
-    private ListView listView;
-    ArrayList<String> data;
+    private Parcelable recyclerState;
+    List<SearchResult> data;
     Button upButton;
-    Button searchButton;
-    EditText editText;
+    @BindView(R.id.start_search) Button searchButton;
+    EditText searchField;
+    private SearchResultAdapter adapter;
+    @BindView(R.id.search_error) protected TextView error;
+    @BindView(R.id.search_results) protected RecyclerView searchResults;
+    private String request;
+
+
+    private void setVisibilityOnError() {
+        error.setVisibility(View.VISIBLE);
+        searchResults.setVisibility(View.GONE);
+    }
+
+    private void setVisibilityOnResult() {
+        error.setVisibility(View.GONE);
+        error.setVisibility(View.VISIBLE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchlist);
-        listView = (ListView) findViewById(R.id.lv);
-        searchButton = (Button) findViewById(R.id.start_search);
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                editText = (EditText) findViewById(R.id.request);
-                String request = editText.getText().toString();
-                data = doRequest(request);
-                fillList();
+                searchField = (EditText) findViewById(R.id.request);
+                request = searchField.getText().toString();
+                if (request.length() == 0) {
+                    setVisibilityOnError();
+                    error.setText(getString(R.string.error_empty_request));
+                    return;
+                }
+                Bundle args = new Bundle();
+                args.putString("request", request);
+                getSupportLoaderManager().initLoader(0, args, null);
             }
         });
 
@@ -44,55 +73,71 @@ public class SearchActivity extends BaseActivity {
         upButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                listView.setSelection(0);
+                searchResults.scrollToPosition(0);
             }
         });
-
-        //possibly crashes
-        //click item list listener
-        listView.setOnClickListener((View.OnClickListener) new DrawerItemClickListener());
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // only UI is saved, whereas data is saved in Loader
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList("data", data);
+        outState.putParcelable("adapter", searchResults.getLayoutManager().onSaveInstanceState());
     }
 
-    // songs - songlist
-    //при каждом заполнении все данные сохраняются в data, чтобы при повороте экрана все восстановилось
-    protected void fillList(){
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                R.layout.my_list_item, data);
-        listView.setAdapter(adapter);
-    }
-
-    private ArrayList<String> doRequest(String inp){
-        ArrayList<String> ret = null;
-        //ret = ...
-        return ret;
-    }
-
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener{
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-            selectItem(position);
+    @Override
+    protected void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            recyclerState = savedInstanceState.getParcelable("adapter");
+            searchResults.getLayoutManager().onRestoreInstanceState(recyclerState);
         }
-        //TODO each item should open new SongActivity
-        private void selectItem(int position){
-            switch (position) {
-                case 0: //0 item clicked
+    }
+
+    @Override
+    public Loader<LoadResult<List<SearchResult>>> onCreateLoader(int id, Bundle args) {
+        return new LyricsLoader(this, args);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<LoadResult<List<SearchResult>>> loader,
+                               final LoadResult<List<SearchResult>> result) {
+        if (result.type == LoadResult.ResultType.OK) {
+            setVisibilityOnResult();
+            adapter = new SearchResultAdapter(this);
+            adapter.setSearchResults(result.data);
+            data = result.data;
+            adapter.setListener(new SearchResultAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    URL url = result.data.get(position).url;
+                    startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
+                }
+            });
+            searchResults.setAdapter(adapter);
+
+        } else {
+            setVisibilityOnError();
+            String errorMessage = "";
+            switch (result.type) {
+                case EMPTY:
+                    errorMessage = "Search for" + request + "produced no results";
                     break;
-                case 1:
+                case NO_NETWORK:
+                    errorMessage = "There is no network connection";
                     break;
-                default:
+                case UNKNOWN_ERROR:
+                    errorMessage = "Unknown error";
                     break;
             }
-
+            error.setText(errorMessage);
         }
-
     }
 
+    @Override
+    public void onLoaderReset(Loader<LoadResult<List<SearchResult>>> loader) {
+        error.setVisibility(View.GONE);
+        searchResults.setVisibility(View.GONE);
+    }
 
 }

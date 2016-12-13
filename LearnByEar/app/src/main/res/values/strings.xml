@@ -17,5 +17,10 @@
     <string name="delete_account">Delete account</string>
     <string name="sign_out_fail">Sign out failed!</string>
     <string name="del_account_fail">Account deletion failed!</string>
+    <string name="error_empty_request">The request is empty</string>
+
+    <string name="search_hint">Input here</string>
+    <string name="go">Go!</string>
+    <string name="up">Up</string>
 
 </resources>

@@ -45,7 +45,6 @@
 
         <activity android:name=".BaseActivity" />
         <activity android:name=".SignedInActivity" />
-        <activity android:name=".SearchResultsActivity"></activity>
     </application>
 
 </manifest>
