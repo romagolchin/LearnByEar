@@ -3,11 +3,18 @@ package olegkuro.learnbyear;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import java.util.Arrays;
+import java.util.List;
+
+import olegkuro.learnbyear.loader.HTMLLyricsParser;
+import olegkuro.learnbyear.loader.SearchResult;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -22,5 +29,15 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("olegkuro.learnbyear", appContext.getPackageName());
+    }
+
+    @Test
+    public void testHTMLParse() throws Exception {
+        HTMLLyricsParser parser = new HTMLLyricsParser();
+        List<SearchResult> searchResults = parser.search("bob dylan", Arrays.asList("en"));
+        if (searchResults != null) {
+            for (SearchResult searchResult : searchResults)
+                Log.d(getClass().getSimpleName(), searchResult.toString());
+        }
     }
 }
