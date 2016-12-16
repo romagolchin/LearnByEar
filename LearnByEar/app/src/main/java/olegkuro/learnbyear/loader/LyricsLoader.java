@@ -4,15 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,54 +38,54 @@ public class LyricsLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
 
     @Override
     public LoadResult<List<SearchResult>> loadInBackground() {
-        // TODO search in database and azlyrics
-        Uri.Builder builder = Uri.parse(BASE_URI).buildUpon();
         List<String> urls = new ArrayList<>();
+        Uri.Builder builder = Uri.parse(BASE_URI).buildUpon();
+        // TODO search in database and azlyrics
         List<SearchResult> searchResults = new ArrayList<>();
-        for (String langTo : langCodesTo) {
-            try {
-                builder.appendPath(langTo).appendPath("site-search").appendQueryParameter("query", query)
-                        .appendQueryParameter("op", "Search");
-                String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
-                String url = builder.build().toString() + anchor;
-                Log.d(TAG + " request", url);
-                WebClient client = new WebClient();
-                WebRequest request = new WebRequest(new URL(url));
-                HtmlPage page = client.getPage(request);
-                client.getOptions().setJavaScriptEnabled(true);
-                for (int i = 0; i < 5; ++i) {
-                    int res = client.waitForBackgroundJavaScript(1000);
-                }
-                List<?> links = page.getByXPath("//a[@class=gs-per-result-labels]");
-                Log.d(TAG + " links size", String.valueOf(links.size()));
-                String songUrl;
-                boolean isLyricsUrl = false;
-                for (int i = 0; i < links.size(); ++i) {
-                    if (links.get(i) instanceof DomElement) {
-                        DomElement link = (DomElement) links.get(i);
-                        String title = link.getTextContent();
-                        songUrl = link.getAttribute("href");
-                        // assume it's a page of a musician
-                        if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
-                            continue;
-                        int cnt = 0;
-                        String path = new URL(songUrl).getPath();
-                        for (int j = 0; j < path.length(); ++j) {
-                            char c = path.charAt(j);
-                            if (c == '/')
-                                ++cnt;
-                        }
-                        if (cnt != 1)
-                            continue;
-                        found = true;
-                        searchResults.add(new SearchResult(title, new URL(songUrl)));
-                    }
-                }
-            } catch (Exception e) {
-                Log.d(TAG, "", e);
-            }
-
-        }
+//        for (String langTo : langCodesTo) {
+//            try {
+//                builder.appendPath(langTo).appendPath("site-search").appendQueryParameter("query", query)
+//                        .appendQueryParameter("op", "Search");
+//                String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
+//                String url = builder.build().toString() + anchor;
+//                Log.d(TAG + " request", url);
+//                WebClient client = new WebClient();
+//                WebRequest request = new WebRequest(new URL(url));
+//                HtmlPage page = client.getPage(request);
+//                client.getOptions().setJavaScriptEnabled(true);
+//                for (int i = 0; i < 5; ++i) {
+//                    int res = client.waitForBackgroundJavaScript(1000);
+//                }
+//                List<?> links = page.getByXPath("//a[@class=gs-per-result-labels]");
+//                Log.d(TAG + " links size", String.valueOf(links.size()));
+//                String songUrl;
+//                boolean isLyricsUrl = false;
+//                for (int i = 0; i < links.size(); ++i) {
+//                    if (links.get(i) instanceof DomElement) {
+//                        DomElement link = (DomElement) links.get(i);
+//                        String title = link.getTextContent();
+//                        songUrl = link.getAttribute("href");
+//                        // assume it's a page of a musician
+//                        if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
+//                            continue;
+//                        int cnt = 0;
+//                        String path = new URL(songUrl).getPath();
+//                        for (int j = 0; j < path.length(); ++j) {
+//                            char c = path.charAt(j);
+//                            if (c == '/')
+//                                ++cnt;
+//                        }
+//                        if (cnt != 1)
+//                            continue;
+//                        found = true;
+//                        searchResults.add(new SearchResult(title, new URL(songUrl)));
+//                    }
+//                }
+//            } catch (Exception e) {
+//                Log.d(TAG, "", e);
+//            }
+//
+//        }
         return new LoadResult<>(searchResults, LoadResult.ResultType.OK);
     }
 }
