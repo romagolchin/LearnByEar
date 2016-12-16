@@ -3,20 +3,16 @@ package olegkuro.learnbyear.loader;
 import android.net.Uri;
 import android.util.Log;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import olegkuro.learnbyear.model.Lyrics;
 
@@ -43,44 +39,37 @@ public class HTMLLyricsParser {
                 String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
                 String url = builder.build().toString() + anchor;
                 Log.d(TAG + " request", url);
-                WebDriver driver = new FirefoxDriver();
-                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                driver.get(url);
-                List<WebElement> links = driver.findElements(By.className("gs-per-result-labels"));
-                List<WebElement> headerElements = driver.findElements(By.className("gs-title"));
+                WebClient client = new WebClient();
+                WebRequest request = new WebRequest(new URL(url));
+                HtmlPage page = client.getPage(request);
+                client.getOptions().setJavaScriptEnabled(true);
+                for (int i = 0; i < 5; ++i) {
+                    int res = client.waitForBackgroundJavaScript(1000);
+                }
+                List<?> links = page.getByXPath("//a[@class=gs-per-result-labels]");
                 Log.d(TAG + " links size", String.valueOf(links.size()));
-                Log.d(TAG + " headerElements size", String.valueOf(headerElements.size()));
-//                Document doc = Jsoup.connect(url).get();
-//                String all = doc.html();
-//                System.out.println(all);
-//                System.out.println(all.indexOf("gs-per-result-labels"));
-//                Elements links = doc.getElementsByClass("gs-per-result-labels");
-//                Element content = doc.getElementById("content");
-//                Log.d(TAG, String.valueOf(links.size()));
-//                if (links.size() == 0) {
-//                    return searchResults;
-//                }
-//                Elements headerElements = doc.getElementsByClass("gs-title");
-//                Log.d(TAG, String.valueOf(headerElements.size()));
                 String songUrl;
                 boolean isLyricsUrl = false;
                 for (int i = 0; i < links.size(); ++i) {
-                    WebElement link = links.get(i);
-                    songUrl = link.getAttribute("url");
-                    // assume it's a page of a musician
-                    if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
-                        continue;
-                    int cnt = 0;
-                    String path = new URL(songUrl).getPath();
-                    for (int j = 0; j < path.length(); ++j) {
-                        char c = path.charAt(j);
-                        if (c == '/')
-                            ++cnt;
+                    if (links.get(i) instanceof DomElement) {
+                        DomElement link = (DomElement) links.get(i);
+                        String title = link.getTextContent();
+                        songUrl = link.getAttribute("href");
+                        // assume it's a page of a musician
+                        if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
+                            continue;
+                        int cnt = 0;
+                        String path = new URL(songUrl).getPath();
+                        for (int j = 0; j < path.length(); ++j) {
+                            char c = path.charAt(j);
+                            if (c == '/')
+                                ++cnt;
+                        }
+                        if (cnt != 1)
+                            continue;
+                        found = true;
+                        searchResults.add(new SearchResult(title, new URL(songUrl)));
                     }
-                    if (cnt != 1)
-                        continue;
-                    found = true;
-                    searchResults.add(new SearchResult(headerElements.get(i).getText(), new URL(songUrl)));
                 }
             } catch (Exception e) {
                 Log.d(TAG, "", e);
@@ -92,11 +81,14 @@ public class HTMLLyricsParser {
 
     public Lyrics parse(String url) {
         try {
-            Document doc = Jsoup.connect(url).get();
-            Element content = doc.getElementById("content-area");
-            Element translationArea = content.getElementsByClass("translate-node-text").first();
-            String translationLanguage = translationArea.getElementsByClass("info-line").first()
-                    .getElementsByClass("info-line-left").first().ownText();
+            WebClient client = new WebClient();
+            WebRequest request = new WebRequest(new URL(url));
+            HtmlPage page = client.getPage(request);
+            client.getOptions().setJavaScriptEnabled(true);
+            DomElement content = page.getElementById("content-area");
+            DomElement translationArea = content.getFirstByXPath("//div[@class=translate-node-text]");
+            DomElement info = translationArea.getFirstByXPath("//div[@class=info-line-left]");
+            String translationLanguage = info.getTextContent();
             Log.d(TAG + " translationLanguage", translationLanguage);
             int index = -1;
             for (int i = 0; i < translationLanguage.length(); ++i) {
@@ -106,17 +98,18 @@ public class HTMLLyricsParser {
             }
             if (index >= 0)
                 translationLanguage = translationLanguage.substring(index);
-            String translatedTitle = translationArea.getElementsByClass("title-h2").first().ownText();
+            
+            String translatedTitle = ((DomElement) translationArea.getFirstByXPath("//h2[@class=title-h2]")).getTextContent();
             ArrayList<String> translation = new ArrayList<>();
-            for (Element line : translationArea.getElementsByClass("par")) {
-                translation.add(line.ownText());
+            for (DomElement line : (List<DomElement>) (((DomElement) translationArea).getByXPath("par"))) {
+                translation.add(line.getTextContent());
             }
-            Element lyricsArea = content.getElementsByClass("song-node-text").first();
-            String language = lyricsArea.getElementsByClass("info-line-left").first().ownText();
-            String title = lyricsArea.getElementsByClass("title-h2").first().ownText();
+            DomElement lyricsArea = content.getFirstByXPath("//div[@class=song-node-text]");
+            String language = ( (DomElement) lyricsArea.getFirstByXPath("//div[@class=info-line-left]")).getTextContent();
+            String title = ((DomElement) lyricsArea.getFirstByXPath("//h2[@class=title-h2]")).getTextContent();
             ArrayList<String> lyrics = new ArrayList<>();
-            for (Element line : lyricsArea.getElementsByClass("par")) {
-                lyrics.add(line.ownText());
+            for (DomElement line : (List<DomElement>) lyricsArea.getByXPath("par")) {
+                lyrics.add(line.getTextContent());
             }
             return new Lyrics(language, null, lyrics, title,
                     translatedTitle, translation, translationLanguage, Lyrics.TranslationType.HUMAN);

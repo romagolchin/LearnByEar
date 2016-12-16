@@ -6,12 +6,13 @@ import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,36 +51,43 @@ public class LyricsLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
         List<String> urls = new ArrayList<>();
         List<SearchResult> searchResults = new ArrayList<>();
         for (String langTo : langCodesTo) {
-            builder.appendPath(langTo).appendQueryParameter("query", query)
-                    .appendQueryParameter("op", "Search");
-            String anchor = "#gsc.tab=0&gsc.q=" + query + "&gsc.page=1";
             try {
+                builder.appendPath(langTo).appendPath("site-search").appendQueryParameter("query", query)
+                        .appendQueryParameter("op", "Search");
+                String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
                 String url = builder.build().toString() + anchor;
-                Document doc = Jsoup.connect(url).get();
-                Elements links = doc.getElementsByClass("gs-per-result-labels");
-                if (links.size() == 0) {
-                    return null;
+                Log.d(TAG + " request", url);
+                WebClient client = new WebClient();
+                WebRequest request = new WebRequest(new URL(url));
+                HtmlPage page = client.getPage(request);
+                client.getOptions().setJavaScriptEnabled(true);
+                for (int i = 0; i < 5; ++i) {
+                    int res = client.waitForBackgroundJavaScript(1000);
                 }
-                Elements headerElements = doc.getElementsByClass("gs-title");
+                List<?> links = page.getByXPath("//a[@class=gs-per-result-labels]");
+                Log.d(TAG + " links size", String.valueOf(links.size()));
                 String songUrl;
                 boolean isLyricsUrl = false;
                 for (int i = 0; i < links.size(); ++i) {
-                    Element link = links.get(i);
-                    songUrl = link.attr("url");
-                    // assume it's a page of a musician
-                    if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
-                        continue;
-                    int cnt = 0;
-                    String path = new URL(songUrl).getPath();
-                    for (int j = 0; j < path.length(); ++j) {
-                        char c = path.charAt(j);
-                        if (c == '/')
-                            ++cnt;
+                    if (links.get(i) instanceof DomElement) {
+                        DomElement link = (DomElement) links.get(i);
+                        String title = link.getTextContent();
+                        songUrl = link.getAttribute("href");
+                        // assume it's a page of a musician
+                        if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
+                            continue;
+                        int cnt = 0;
+                        String path = new URL(songUrl).getPath();
+                        for (int j = 0; j < path.length(); ++j) {
+                            char c = path.charAt(j);
+                            if (c == '/')
+                                ++cnt;
+                        }
+                        if (cnt != 1)
+                            continue;
+                        found = true;
+                        searchResults.add(new SearchResult(title, new URL(songUrl)));
                     }
-                    if (cnt != 1)
-                        continue;
-                    found = true;
-                    searchResults.add(new SearchResult(headerElements.get(i).ownText(), new URL(songUrl)));
                 }
             } catch (Exception e) {
                 Log.d(TAG, "", e);
