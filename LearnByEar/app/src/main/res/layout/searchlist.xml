@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bckgr">
 
@@ -16,6 +18,8 @@
         android:layout_alignParentLeft="true"
         />
     <Button
+
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/start_search"
@@ -25,15 +29,8 @@
         android:layout_marginRight="10dp"
         android:background="@drawable/mybutton"/>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lv"
-        android:layout_below="@id/start_search">
-
-    </ListView>
-
     <LinearLayout
+        android:layout_below="@+id/start_search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/layout_bottom_bar"
@@ -43,15 +40,26 @@
         android:gravity="center"
         android:padding="5dip"
         >
-
-        <Button
-            android:layout_width="wrap_content"
+            <ListView
+                android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button_up"
-            android:gravity="center"
-            android:padding="5dip"
-            android:text="At the begin"
-            android:background="@drawable/mybutton"/>
+            android:id="@+id/lv"
+            android:layout_alignStart="@+id/request">
+
+        </ListView>
+
 
     </LinearLayout>
+    <Button
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_up"
+        android:gravity="center"
+        android:padding="5dip"
+        android:text="At the begin"
+        android:background="@drawable/mybutton"/>
+
 </RelativeLayout>

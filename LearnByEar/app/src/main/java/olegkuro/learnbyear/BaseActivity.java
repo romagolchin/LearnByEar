@@ -28,7 +28,7 @@ public class BaseActivity extends AppCompatActivity {
         //Change Language
         //if you'd like u may change if -> switch
         if (id == R.id.search_song){
-            Intent intent = new Intent(this, SongActivity.class);
+            Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
             return true; //poisk pesni sobsna
         }

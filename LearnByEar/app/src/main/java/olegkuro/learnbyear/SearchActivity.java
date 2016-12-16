@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Елена on 07.12.2016.
@@ -23,11 +24,17 @@ public class SearchActivity extends BaseActivity {
     Button searchButton;
     EditText editText;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        data = new ArrayList<>();
+        for (int i = 1; i < 101; i++){
+            data.add("Item " + i);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchlist);
         listView = (ListView) findViewById(R.id.lv);
+        fillList();
         searchButton = (Button) findViewById(R.id.start_search);
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -49,8 +56,9 @@ public class SearchActivity extends BaseActivity {
         });
 
         //possibly crashes
+        // UPD: CRASHES!!!
         //click item list listener
-        listView.setOnClickListener((View.OnClickListener) new DrawerItemClickListener());
+       // listView.setOnClickListener((View.OnClickListener) new DrawerItemClickListener());
     }
 
     @Override
