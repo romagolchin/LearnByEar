@@ -1,13 +1,14 @@
 package olegkuro.learnbyear.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Roman on 01/12/2016.
  */
 
-public class Lyrics {
-    public enum TranslationType {
+public class Lyrics implements Serializable{
+    public enum TranslationType{
         HUMAN,
         MACHINE
     }
@@ -19,7 +20,6 @@ public class Lyrics {
     public List<String> lyrics;
     public List<String> translation;
     public TranslationType typeOfTranslation;
-
     public Lyrics(String language, String artist, List<String> lyrics, String title,
                   String translatedTitle, List<String> translation,
                   String translationLanguage, TranslationType typeOfTranslation) {

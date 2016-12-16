@@ -43,7 +43,10 @@ public class BaseActivity extends AppCompatActivity {
 
         //Exit
         if (id == R.id.exit){
-            return true;
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("EXIT", true);
+            startActivity(intent);
         }
 
         if (id == R.id.login) {
