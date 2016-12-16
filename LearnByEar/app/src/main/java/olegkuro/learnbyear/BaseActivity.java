@@ -1,6 +1,7 @@
 package olegkuro.learnbyear;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -37,13 +38,21 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         //show Authors
+        //TODO possibly crashes due to network absence
         if (id == R.id.authors){
-            return true;
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+            intent.setData(Uri.parse("https://github.com/romagolchin/LearnByEar"));
+            startActivity(intent);
         }
 
         //Exit
         if (id == R.id.exit){
-            return true;
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("EXIT", true);
+            startActivity(intent);
         }
 
         if (id == R.id.login) {

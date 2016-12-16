@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -48,8 +49,10 @@ public class SearchActivity extends BaseActivity
         error.setVisibility(View.VISIBLE);
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        data = new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchlist);
         searchButton.setOnClickListener(new View.OnClickListener(){

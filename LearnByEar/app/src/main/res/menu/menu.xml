@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
+    <!--
+    <item
+        android:title="firebase"
+        android:orderInCategory="0"
+        android:icon="@drawable/bckgr"
+        android:id="@+id/firebase_menu" /> -->
     <item
         android:showAsAction="never"
         android:orderInCategory="1"
