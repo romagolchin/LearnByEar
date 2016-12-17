@@ -42,12 +42,12 @@ android {
 
 
 dependencies {
-    compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
+//    compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile 'com.google.firebase:firebase-database:10.0.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
@@ -55,6 +55,7 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-auth:1.0.1'
     compile 'com.jakewharton:butterknife:8.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.android.support:design:25.1.0'
 //    compile 'net.sourceforge.htmlunit:htmlunit:2.23'
     // Crashlytics Kit
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {

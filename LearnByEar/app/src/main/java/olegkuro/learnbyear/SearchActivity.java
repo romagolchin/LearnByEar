@@ -18,7 +18,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import olegkuro.learnbyear.loader.LoadResult;
-import olegkuro.learnbyear.loader.LyricsLoader;
+import olegkuro.learnbyear.loader.SearchLoader;
 import olegkuro.learnbyear.loader.SearchResult;
 
 /**
@@ -99,7 +99,7 @@ public class SearchActivity extends BaseActivity
 
     @Override
     public Loader<LoadResult<List<SearchResult>>> onCreateLoader(int id, Bundle args) {
-        return new LyricsLoader(this, args);
+        return new SearchLoader(this, args);
     }
 
     @Override

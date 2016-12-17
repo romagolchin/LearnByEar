@@ -14,7 +14,7 @@ import java.util.List;
  * and <a href="http://azlyrics.com"></a>
  */
 
-public class LyricsLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>> {
+public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>> {
     private LoadResult<List<SearchResult>> result = null;
     private final String TAG = getClass().getSimpleName();
     private static final String BASE_URI = "http://lyricstranslate.com/";
@@ -22,7 +22,7 @@ public class LyricsLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
     private String query;
     private List<String> langCodesTo;
 
-    public LyricsLoader(Context context, Bundle args) {
+    public SearchLoader(Context context, Bundle args) {
         super(context);
         this.query = args.getString("query");
         this.langCodesTo = args.getStringArrayList("langCodesTo");
