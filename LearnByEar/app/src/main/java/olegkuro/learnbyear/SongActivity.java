@@ -2,14 +2,23 @@ package olegkuro.learnbyear;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
+import butterknife.BindView;
+import olegkuro.learnbyear.auth.AuthenticationActivity;
 
 /**
  * Created by Елена on 07.12.2016.
@@ -17,12 +26,19 @@ import java.util.Map;
 
 public class SongActivity extends BaseActivity implements Button.OnClickListener {
     private class Tokenizer {
-        public char[] splitChars = {' ', '\t', ',', '?', '!', ';', ':', '.', };
+        public char[] splitChars = {' ', '\t', ',', '?', '!', ';', ':', '.',};
     }
+
+    protected LinearLayout grammarSheet;
+    @BindView(R.id.recycler_lyrics)
+    protected RecyclerView recyclerLyrics;
     private final String TAG = getClass().getSimpleName();
     private static final int noSelection = -1;
-    private List<String> lyrics;
-    private List<String> translations;
+    private List<String> lyrics = new ArrayList<>();
+    private List<String> translation = new ArrayList<>();
+    private List<String> all = new ArrayList<>();
+    private LyricsAdapter adapter;
+
     private class Word {
         public String word;
         public List<String> meaning;
@@ -31,26 +47,39 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
         public int tokenStart;
         public int tokenEnd;
     }
+
     private List<List<Word>> words;
     // get word by its start index
     private Map<WordCoordinates, Word> wordMap;
     private Map<String, WordCoordinates> coordiantesMap;
     // highlighting as well
     private List<Selection> selections;
+
     private class WordCoordinates {
         public int lineNumber;
         public int index;
     }
+
     private class Selection {
         public List<WordCoordinates> wordCoordinates;
 
     }
 
-    /**
-     * if the word is selected, this action overwrites that selection
-     */
+
     private void changeSelection(int lineNumber, int index) {
         // if cursor position is not on a split character highlight the word and update
+    }
+
+    private void readTest(int resource) {
+        InputStream is = getResources().openRawResource(resource);
+        Scanner scanner = new Scanner(is);
+        while (scanner.hasNext()) {
+            String s = scanner.next();
+            translation.add(s);
+        }
+        try {
+            is.close();
+        } catch(Exception e) {}
     }
 
     @Override
@@ -60,6 +89,7 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
                 if (!AuthenticationActivity.isSignedIn)
                     startActivity(new Intent(this, AuthenticationActivity.class));
                 else {
+
                     //TODO edit
                     //set onClickListeners
                 }
@@ -87,7 +117,42 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
             Log.d(TAG, "logged in");
         } else
             Log.d(TAG, "not logged in");
+        grammarSheet = (LinearLayout) findViewById(R.id.grammar_sheet);
+        BottomSheetBehavior.from(grammarSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
 
+    }
+
+    @Override
+    protected void onStart() {
+        displayNonEmptyData();
+    }
+
+    private void highlightGrammar() {
+
+    }
+
+    private void displayNonEmptyData() {
+        readTest(R.raw.lyrics);
+        readTest(R.raw.translation);
+        for (int i = 0; i < Math.min(lyrics.size(), translation.size()); ++i) {
+            all.add(lyrics.get(i));
+            all.add(translation.get(i));
+        }
+        adapter = new LyricsAdapter();
+        adapter.setListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+            }
+
+            @Override
+            public void onItemClick(int lineNumber, int index) {
+                BottomSheetBehavior behavior = BottomSheetBehavior.from(grammarSheet);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                recyclerLyrics.scrollToPosition(lineNumber);
+                Log.d(TAG + "line number & index", String.valueOf(lineNumber) + " " +
+                String.valueOf(index));
+            }
+        });
     }
 
 

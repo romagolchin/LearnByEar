@@ -1,4 +1,4 @@
-package olegkuro.learnbyear;
+package olegkuro.learnbyear.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.widget.Button;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import olegkuro.learnbyear.BaseActivity;
+import olegkuro.learnbyear.R;
 
 public class SignedInActivity extends BaseActivity implements Button.OnClickListener {
 

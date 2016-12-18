@@ -1,10 +1,11 @@
-package olegkuro.learnbyear.loader;
+package olegkuro.learnbyear.loaders;
 
 import android.net.Uri;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
 
 

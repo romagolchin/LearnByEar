@@ -10,7 +10,7 @@
     android:background="@drawable/bckgr"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="olegkuro.learnbyear.SignedInActivity">
+    tools:context="olegkuro.learnbyear.auth.SignedInActivity">
 
     <TextView
         style="@style/Base.TextAppearance.AppCompat.Headline"

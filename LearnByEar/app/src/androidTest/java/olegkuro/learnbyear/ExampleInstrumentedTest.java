@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;
 
-import olegkuro.learnbyear.loader.HTMLLyricsParser;
-import olegkuro.learnbyear.loader.SearchResult;
+import olegkuro.learnbyear.loaders.HTMLLyricsParser;
+import olegkuro.learnbyear.loaders.search.SearchResult;
 
 import static org.junit.Assert.assertEquals;
 

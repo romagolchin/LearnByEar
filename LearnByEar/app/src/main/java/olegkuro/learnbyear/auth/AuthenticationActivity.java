@@ -1,4 +1,4 @@
-package olegkuro.learnbyear;
+package olegkuro.learnbyear.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,10 @@ import com.firebase.ui.auth.AuthUI;
 
 import java.util.Arrays;
 
+import olegkuro.learnbyear.BaseActivity;
+import olegkuro.learnbyear.R;
+import olegkuro.learnbyear.SongActivity;
+
 import static com.firebase.ui.auth.ui.ResultCodes.RESULT_NO_NETWORK;
 
 /**
@@ -16,7 +20,7 @@ import static com.firebase.ui.auth.ui.ResultCodes.RESULT_NO_NETWORK;
 public class AuthenticationActivity extends BaseActivity {
     public static boolean isSignedIn = false;
     public static final int RC_SIGNIN = 100;
-    public static final String signedInAction = "olegkuro.learnbyear.AuthenticationActivity.action_signed_in";
+    public static final String signedInAction = "olegkuro.learnbyear.auth.AuthenticationActivity.action_signed_in";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,8 +28,8 @@ public class AuthenticationActivity extends BaseActivity {
         startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
                 .setProviders(Arrays.asList(
                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()
-        )).setLogo(R.drawable.firebase_auth_120dp).build(), AuthenticationActivity.RC_SIGNIN);
+                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
+                .setLogo(R.drawable.firebase_auth_120dp).build(), RC_SIGNIN);
 
     }
 

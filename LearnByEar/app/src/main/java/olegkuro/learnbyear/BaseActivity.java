@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import olegkuro.learnbyear.auth.AuthenticationActivity;
+
 public class BaseActivity extends AppCompatActivity {
 
     @Override

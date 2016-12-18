@@ -1,4 +1,4 @@
-package olegkuro.learnbyear.loader;
+package olegkuro.learnbyear.loaders.search;
 
 import android.content.Context;
 import android.net.Uri;

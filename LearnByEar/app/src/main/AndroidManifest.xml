@@ -29,7 +29,7 @@
         <activity
             android:name=".SearchActivity"
             android:label="Search" />
-        <activity android:name=".AuthenticationActivity" />
+        <activity android:name=".auth.AuthenticationActivity" />
         <activity android:name="com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity" />
 
         <meta-data xmlns:tools="http://schemas.android.com/tools"
@@ -44,7 +44,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".BaseActivity" />
-        <activity android:name=".SignedInActivity" />
+        <activity android:name=".auth.SignedInActivity" />
     </application>
 
 </manifest>

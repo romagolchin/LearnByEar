@@ -1,7 +1,7 @@
 package olegkuro.learnbyear;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 
 /**
@@ -9,20 +9,19 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public class MainActivity extends BaseActivity {
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false))
-        finish();
+            finish();
         super.onCreate(savedInstanceState);
-//        startActivity(new Intent(this, SongActivity.class));
+        startActivity(new Intent(this, SongActivity.class));
         setContentView(R.layout.main_layout);
     }
 
-    protected void onSaveInstanceState(Bundle outState){
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //outState.putAll();
         //TODO put identifiers here
     }
-
 
 
 }

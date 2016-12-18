@@ -25,5 +25,6 @@
 
     <string name="preview_gloss">Preview</string>
     <string name="submit_gloss">Submit</string>
+    <string name="deselect">Deselect all</string>
 
 </resources>

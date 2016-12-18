@@ -1,4 +1,4 @@
-package olegkuro.learnbyear.loader;
+package olegkuro.learnbyear.loaders.search;
 
 /**
  * Created by Roman on 12/12/2016.

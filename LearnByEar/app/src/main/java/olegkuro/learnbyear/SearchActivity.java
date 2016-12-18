@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import olegkuro.learnbyear.loader.LoadResult;
-import olegkuro.learnbyear.loader.SearchLoader;
-import olegkuro.learnbyear.loader.SearchResult;
+import olegkuro.learnbyear.loaders.search.LoadResult;
+import olegkuro.learnbyear.loaders.search.SearchLoader;
+import olegkuro.learnbyear.loaders.search.SearchResult;
 
 /**
  * Created by Елена on 07.12.2016.
@@ -108,9 +108,14 @@ public class SearchActivity extends BaseActivity
         if (result.type == LoadResult.ResultType.OK) {
             setVisibilityOnResult();
             adapter = new SearchResultAdapter(this);
-            adapter.setSearchResults(result.data);
+            adapter.setData(result.data);
             data = result.data;
-            adapter.setListener(new SearchResultAdapter.OnItemClickListener() {
+            adapter.setListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(int lineNumber, int index) {
+
+                }
+
                 @Override
                 public void onItemClick(int position) {
                     URL url = result.data.get(position).url;

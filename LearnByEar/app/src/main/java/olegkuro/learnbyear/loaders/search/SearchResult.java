@@ -1,4 +1,4 @@
-package olegkuro.learnbyear.loader;
+package olegkuro.learnbyear.loaders.search;
 
 import com.google.firebase.database.DatabaseReference;
 
