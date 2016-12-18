@@ -13,7 +13,7 @@ public class MainActivity extends BaseActivity {
         if (getIntent().getBooleanExtra("EXIT", false))
             finish();
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this, SongActivity.class));
+//         startActivity(new Intent(this, SongActivity.class));
         setContentView(R.layout.main_layout);
     }
 
