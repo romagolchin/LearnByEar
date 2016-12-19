@@ -54,7 +54,6 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
             super(itemView);
         }
 
-
         public void bind(final int position, @Nullable final OnItemClickListener listener) {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
