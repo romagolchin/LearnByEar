@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchLoader;
 import olegkuro.learnbyear.loaders.search.SearchResult;
@@ -31,11 +30,11 @@ public class SearchActivity extends BaseActivity
     private Parcelable recyclerState;
     List<SearchResult> data;
     Button upButton;
-    @BindView(R.id.start_search) Button searchButton;
+    Button searchButton;
     EditText searchField;
     private SearchResultAdapter adapter;
-    @BindView(R.id.search_error) protected TextView error;
-    @BindView(R.id.search_results) protected RecyclerView searchResults;
+    TextView error;
+    RecyclerView searchResults;
     private String request;
 
 
@@ -52,9 +51,12 @@ public class SearchActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        data = new ArrayList<>();
         super.onCreate(savedInstanceState);
+        data = new ArrayList<>();
         setContentView(R.layout.searchlist);
+        error = (TextView) findViewById(R.id.search_error);
+        searchResults = (RecyclerView) findViewById(R.id.search_results);
+        searchButton = (Button) findViewById(R.id.start_search);
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {

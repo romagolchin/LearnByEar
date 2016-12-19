@@ -11,13 +11,13 @@ import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
-import butterknife.BindView;
 import olegkuro.learnbyear.auth.AuthenticationActivity;
 
 /**
@@ -30,7 +30,6 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
     }
 
     protected LinearLayout grammarSheet;
-    @BindView(R.id.recycler_lyrics)
     protected RecyclerView recyclerLyrics;
     private final String TAG = getClass().getSimpleName();
     private static final int noSelection = -1;
@@ -71,15 +70,17 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
     }
 
     private void readTest(int resource) {
-        InputStream is = getResources().openRawResource(resource);
-        Scanner scanner = new Scanner(is);
-        while (scanner.hasNext()) {
-            String s = scanner.next();
-            translation.add(s);
-        }
         try {
+            InputStream is = getResources().openRawResource(resource);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            String s = null;
+            while ((s = reader.readLine()) != null) {
+                translation.add(s);
+            }
+
             is.close();
-        } catch(Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -118,12 +119,14 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
         } else
             Log.d(TAG, "not logged in");
         grammarSheet = (LinearLayout) findViewById(R.id.grammar_sheet);
-        BottomSheetBehavior.from(grammarSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+        recyclerLyrics = (RecyclerView) findViewById(R.id.recycler_lyrics);
+//        BottomSheetBehavior.from(grammarSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
 
     }
 
     @Override
     protected void onStart() {
+        super.onStart();
         displayNonEmptyData();
     }
 
@@ -150,9 +153,11 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 recyclerLyrics.scrollToPosition(lineNumber);
                 Log.d(TAG + "line number & index", String.valueOf(lineNumber) + " " +
-                String.valueOf(index));
+                        String.valueOf(index));
             }
         });
+        adapter.setData(all);
+        recyclerLyrics.setAdapter(adapter);
     }
 
 

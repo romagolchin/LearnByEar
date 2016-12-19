@@ -6,6 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
+
     }
 }
 
@@ -16,7 +17,6 @@ repositories {
 apply plugin: 'io.fabric'
 
 android {
-    useLibrary 'org.apache.http.legacy'
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
