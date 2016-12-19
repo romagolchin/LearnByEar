@@ -3,6 +3,7 @@ package olegkuro.learnbyear.auth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
 
 import olegkuro.learnbyear.BaseActivity;
 import olegkuro.learnbyear.R;
+import olegkuro.learnbyear.SearchActivity;
 import olegkuro.learnbyear.SongActivity;
 
 import static com.firebase.ui.auth.ui.ResultCodes.RESULT_NO_NETWORK;
@@ -35,9 +37,14 @@ public class AuthenticationActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("test", "RESULT");
+        Log.d("test", new Integer(resultCode).toString());
+        if (data == null) return;
+
         switch(resultCode) {
             case RESULT_OK: {
-                startActivity(new Intent(signedInAction, null, getBaseContext(), SongActivity.class));
+                Intent intent = new Intent(this, SignedInActivity.class);
+                startActivity(intent);
                 isSignedIn = true;
                 finish();
                 break;
