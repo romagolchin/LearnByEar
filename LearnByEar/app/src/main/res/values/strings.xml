@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LearnByEar</string>
     <string name="facebook_app_id">1193124347407752</string>
-
+    <string name="thanks_for_appending">Thanks for appending our lyrics base!</string>
     <string name="action_settings">action settings</string>
     <string name="action_item1">Language</string>
     <string name="action_item2">Authors</string>

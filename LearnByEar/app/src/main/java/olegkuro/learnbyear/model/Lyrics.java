@@ -32,4 +32,10 @@ public class Lyrics implements Serializable{
         this.translationLanguage = translationLanguage;
         this.typeOfTranslation = typeOfTranslation;
     }
+
+    public Lyrics(String language, String artist, String title){
+        this.language = language;
+        this.artist = artist;
+        this.title = title;
+    }
 }
