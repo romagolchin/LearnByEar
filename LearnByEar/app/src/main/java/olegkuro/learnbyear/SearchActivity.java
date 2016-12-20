@@ -6,13 +6,16 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import olegkuro.learnbyear.loaders.search.SearchResult;
 
 public class SearchActivity extends BaseActivity
         implements LoaderManager.LoaderCallbacks<LoadResult<List<SearchResult>>> {
-
+    private boolean loaderInit = false;
     private Parcelable recyclerState;
     List<SearchResult> data;
     Button upButton;
@@ -53,37 +56,49 @@ public class SearchActivity extends BaseActivity
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         data = new ArrayList<>();
         setContentView(R.layout.searchlist);
         searchResults = (RecyclerView) findViewById(R.id.search_results);
-        layoutManager = searchResults.getLayoutManager();
         searchButton = (Button) findViewById(R.id.start_search);
-        searchButton.setOnClickListener(new View.OnClickListener(){
+        adapter = new SearchResultAdapter(this);
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 searchField = (EditText) findViewById(R.id.request);
+                if (searchField.getText() != null && searchField.getText().toString().equals(request)) {
+                    return;
+                }
                 request = searchField.getText().toString();
                 if (request.length() == 0) {
                     showToast(getString(R.string.error_empty_request));
                     return;
                 }
+                adapter.clear();
                 Bundle args = new Bundle();
                 args.putString("request", request);
-                getSupportLoaderManager().initLoader(0, args, SearchActivity.this);
+                if (!loaderInit) {
+                    getSupportLoaderManager().initLoader(0, args, SearchActivity.this);
+                    loaderInit = true;
+                } else {
+                    getSupportLoaderManager().restartLoader(0, args, SearchActivity.this);
+                }
             }
         });
-        testResult();
         //simply turns back to the first item
         upButton = (Button) findViewById(R.id.button_up);
-        upButton.setOnClickListener(new View.OnClickListener(){
+        upButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 searchResults.scrollToPosition(0);
             }
         });
+        searchResults.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = searchResults.getLayoutManager();
+        searchResults.setAdapter(adapter);
     }
 
     @Override
@@ -92,6 +107,8 @@ public class SearchActivity extends BaseActivity
         super.onSaveInstanceState(outState);
         if (layoutManager != null)
             outState.putParcelable("adapter", layoutManager.onSaveInstanceState());
+        outState.putBoolean("loaderInit", loaderInit);
+        outState.putSerializable("data", (Serializable) data);
     }
 
     @Override
@@ -101,6 +118,12 @@ public class SearchActivity extends BaseActivity
             recyclerState = savedInstanceState.getParcelable("adapter");
             if (layoutManager != null)
                 layoutManager.onRestoreInstanceState(recyclerState);
+            loaderInit = savedInstanceState.getBoolean("loaderInit");
+            try {
+                data = (List<SearchResult>) savedInstanceState.getSerializable("data");
+            } catch(ClassCastException e) {}
+            if (data != null)
+                System.out.println(data.size());
         }
     }
 
@@ -109,25 +132,33 @@ public class SearchActivity extends BaseActivity
         return new SearchLoader(this, args);
     }
 
+
     @Override
     public void onLoadFinished(Loader<LoadResult<List<SearchResult>>> loader,
                                final LoadResult<List<SearchResult>> result) {
         if (result.type == LoadResult.ResultType.OK) {
             setVisibilityOnResult();
-            adapter = new SearchResultAdapter(this);
             adapter.setData(result.data);
-//            data = result.data;
-            searchResults.setAdapter(adapter);
+            data = result.data;
+            Log.d(getClass().getSimpleName() + " getItemCount", String.valueOf(adapter.getItemCount()));
             adapter.setListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(int lineNumber, int index) {
 
                 }
-
                 @Override
                 public void onItemClick(int position) {
-                    URL url = result.data.get(position).url;
-                    startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
+                    Log.d(TAG + " onItemClick position", String.valueOf(position));
+                    SearchResult posResult = result.data.get(position);
+                    Intent intent = new Intent(SearchActivity.this, SongActivity.class);
+                    if (posResult != null) {
+                        if (posResult.reference != null)
+                            intent.putExtra("reference", (Serializable) posResult.reference);
+                        else {
+                            intent.putExtra("trackId", posResult.trackId).putExtra("albumId", posResult.albumId);
+                        }
+                    }
+                    startActivity(intent);
                 }
             });
 
@@ -155,8 +186,8 @@ public class SearchActivity extends BaseActivity
         searchResults.setVisibility(View.GONE);
     }
 
-    private void testResult(){
-        if (data.isEmpty()){
+    private void testResult() {
+        if (data.isEmpty()) {
             try {
                 data.add(new SearchResult("Black beatles", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
                 setVisibilityOnResult();

@@ -20,6 +20,17 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
     protected LayoutInflater inflater;
     protected List<T> data = new ArrayList<T>();
 
+    public void clear() {
+        int size = this.data.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                this.data.remove(0);
+            }
+
+            this.notifyItemRangeRemoved(0, size);
+        }
+    }
+
     public CommonAdapter() {
     }
 

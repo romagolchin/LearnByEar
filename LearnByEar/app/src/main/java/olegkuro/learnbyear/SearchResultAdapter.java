@@ -26,14 +26,14 @@ public class SearchResultAdapter extends CommonAdapter<SearchResult> {
     public void onBindVHImpl(CommonViewHolder holder, int position) {
         if (holder instanceof SearchResultHolder) {
             SearchResult searchResult = data.get(position);
-            ((SearchResultHolder) holder).title.setText(searchResult.title);
+            ((SearchResultHolder) holder).title.setText(searchResult.artist + " \u2014 "+ searchResult.title);
             ((SearchResultHolder) holder).author.setText(searchResult.author);
         }
     }
 
     private static class SearchResultHolder extends CommonAdapter.CommonViewHolder {
-        public TextView title;
-        public TextView author;
+        public final TextView title;
+        public final TextView author;
 
         public SearchResultHolder(View itemView) {
             super(itemView);
@@ -42,7 +42,7 @@ public class SearchResultAdapter extends CommonAdapter<SearchResult> {
         }
 
         public static SearchResultHolder newInstance(ViewGroup parent, LayoutInflater inflater) {
-            View itemView = inflater.inflate(R.layout.search_result_item, parent);
+            final View itemView = inflater.inflate(R.layout.search_result_item, parent, false);
             return new SearchResultHolder(itemView);
         }
     }

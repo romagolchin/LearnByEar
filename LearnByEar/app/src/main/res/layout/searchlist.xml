@@ -61,9 +61,11 @@
         tools:layout_marginLeft="5dp" />
 
     <android.support.v7.widget.RecyclerView
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:id="@+id/search_results"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:visibility="visible"
         android:layout_below="@+id/start_search"
         android:layout_alignStart="@+id/request"

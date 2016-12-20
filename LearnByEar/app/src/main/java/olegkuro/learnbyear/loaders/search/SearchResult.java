@@ -9,9 +9,7 @@ import java.net.URL;
  */
 public class SearchResult {
     public String title;
-    /**
-     * at <a href="http://lyricstranslate.com></a>
-     */
+    public String artist;
     public int trackId;
     public int albumId;
     public URL url;
@@ -24,9 +22,10 @@ public class SearchResult {
         this.url = url;
     }
 
-    public SearchResult(int albumId, int trackId, String title) {
+    public SearchResult(int albumId, int trackId, String title, String artist) {
         this.albumId = albumId;
         this.trackId = trackId;
         this.title = title;
+        this.artist = artist;
     }
 }

@@ -8,9 +8,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import olegkuro.learnbyear.auth.AuthenticationActivity;
+import olegkuro.learnbyear.auth.SignedInActivity;
 
 public class BaseActivity extends AppCompatActivity {
+
+    protected final String TAG = getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +32,13 @@ public class BaseActivity extends AppCompatActivity {
         int id = item.getItemId();
 
 
-        //TODO menu event handlers
         //Change Language
-        //if you'd like u may change if -> switch
         if (id == R.id.search_song){
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-            return true; //poisk pesni sobsna
+            if (!SearchActivity.class.equals(getClass())) {
+                Intent intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+                return true; //poisk pesni sobsna
+            }
         }
 
         if (id == R.id.language){
@@ -41,7 +46,6 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         //show Authors
-        //TODO possibly crashes due to network absence
         if (id == R.id.authors){
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
@@ -59,8 +63,14 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         if (id == R.id.login) {
-            Log.d("test", "logging in");
-            startActivity(new Intent(this, AuthenticationActivity.class));
+            if (!AuthenticationActivity.class.equals(getClass())) {
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                if (auth.getCurrentUser() != null) {
+                    startActivity(new Intent(this, SignedInActivity.class));
+                }
+                Log.d("test", "logging in");
+                startActivity(new Intent(this, AuthenticationActivity.class));
+            }
         }
         return super.onOptionsItemSelected(item);
     }

@@ -24,10 +24,9 @@ import olegkuro.learnbyear.NetworkUtils;
  */
 
 public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>> {
-    private LoadResult<List<SearchResult>> result = null;
+    private LoadResult<List<SearchResult>> result;
     private final String TAG = getClass().getSimpleName();
     private static final String BASE_URI = "https://music.yandex.ru/handlers/music-search.jsx";
-    private boolean found = false;
     private String request;
     private List<String> langCodesTo;
 
@@ -47,7 +46,7 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
 
     @Override
     public LoadResult<List<SearchResult>> loadInBackground() {
-        List<String> urls = new ArrayList<>();
+        LoadResult.ResultType type = LoadResult.ResultType.UNKNOWN_ERROR;
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon();
         List<SearchResult> searchResults = new ArrayList<>();
         HttpURLConnection connection;
@@ -78,19 +77,23 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
                         JSONObject track = tracksItems.getJSONObject(j);
                         int trackId = track.getInt("id");
                         int albumId = track.getJSONArray("albums").getJSONObject(0).getInt("id");
-                        searchResults.add(new SearchResult(albumId, trackId, track.getString("title")));
+                        String artist = track.getJSONArray("artists").getJSONObject(0).getString("name");
+                        searchResults.add(new SearchResult(albumId, trackId, track.getString("title"),
+                                artist));
                     }
                 }
             } catch (Exception e) {
                 Log.d(TAG, "", e);
-                return new LoadResult<>(null, LoadResult.ResultType.UNKNOWN_ERROR);
             }
         } else {
-            return new LoadResult<>(null, LoadResult.ResultType.NO_NETWORK);
+            type = LoadResult.ResultType.NO_NETWORK;
         }
-        if (searchResults.size() != 0)
-            return new LoadResult<>(searchResults, LoadResult.ResultType.OK);
-        else
-            return new LoadResult<>(searchResults, LoadResult.ResultType.EMPTY);
+        if (searchResults.size() != 0) {
+            type = LoadResult.ResultType.OK;
+        } else {
+            type = LoadResult.ResultType.UNKNOWN_ERROR;
+        }
+        result = new LoadResult<>(type != LoadResult.ResultType.OK ? null : searchResults, type);
+        return result;
     }
 }

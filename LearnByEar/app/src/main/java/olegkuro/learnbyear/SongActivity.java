@@ -73,9 +73,14 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
         try {
             InputStream is = getResources().openRawResource(resource);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String s = null;
+            String s;
             while ((s = reader.readLine()) != null) {
-                translation.add(s);
+                switch (resource) {
+                    case R.raw.translation:
+                        translation.add(s);
+                    default:
+                        lyrics.add(s);
+                }
             }
 
             is.close();
