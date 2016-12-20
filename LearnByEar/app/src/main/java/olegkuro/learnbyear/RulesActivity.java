@@ -4,12 +4,10 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 
 import java.util.List;
 
 public class RulesActivity extends BaseActivity {
-
     static class Rule {
         public String name;
         public String explanation;
@@ -23,17 +21,7 @@ public class RulesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rules);
         recyclerRules = (RecyclerView) findViewById(R.id.recycler_rules);
-        adapter = new CommonAdapter<Rule>() {
-            @Override
-            public void onBindVHImpl(CommonViewHolder holder, int position) {
-
-            }
-
-            @Override
-            public CommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return null;
-            }
-        };
+        adapter = new RuleAdapter(this);
         adapter.setListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {

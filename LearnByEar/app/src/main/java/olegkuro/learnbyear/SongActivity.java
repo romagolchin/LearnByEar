@@ -130,10 +130,6 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
         displayNonEmptyData();
     }
 
-    private void highlightGrammar() {
-
-    }
-
     private void displayNonEmptyData() {
         readTest(R.raw.lyrics);
         readTest(R.raw.translation);

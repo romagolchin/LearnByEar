@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bckgr"
     android:orientation="vertical">
-
-    <EditText
-        android:id="@+id/request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_margin="2dp"
-        android:layout_marginRight="15dp"
-        android:layout_toLeftOf="@+id/start_search"
-        android:hint="@string/search_hint"
-        android:paddingLeft="13dp" />
 
     <Button
         android:layout_marginTop="10dp"
@@ -27,33 +17,23 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/mybutton"
-        android:text="Go!" />
-
-    <TextView
-        android:id="@+id/search_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/search_results"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/request"
-        android:visibility="visible" />
-
-    <LinearLayout
-        android:id="@+id/layout_bottom_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/start_search"
-        android:clickable="true"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="5dip">
+        android:text="Go!"
+        android:layout_marginBottom="20dp"/>
 
 
-    </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/layout_bottom_bar"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_below="@+id/start_search"-->
+        <!--android:clickable="true"-->
+        <!--android:gravity="center"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:padding="5dip">-->
+
+
+    <!--</LinearLayout>-->
 
     <Button
         android:id="@+id/button_up"
@@ -67,5 +47,26 @@
         android:padding="5dip"
         android:layout_marginBottom="10dp"
         android:text="@string/up" />
+
+    <EditText
+        android:id="@+id/request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="2dp"
+        android:hint="@string/search_hint"
+        android:paddingLeft="13dp"
+        android:layout_marginLeft="2dp"
+        android:layout_alignBottom="@+id/start_search"
+        android:layout_toStartOf="@+id/start_search"
+        tools:layout_marginLeft="5dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/search_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_below="@+id/start_search"
+        android:layout_alignStart="@+id/request"
+        android:layout_marginTop="15dp" />
 
 </RelativeLayout>
