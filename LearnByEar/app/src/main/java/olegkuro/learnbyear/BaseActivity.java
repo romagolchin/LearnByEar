@@ -8,13 +8,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import olegkuro.learnbyear.auth.AuthenticationActivity;
 
 public class BaseActivity extends AppCompatActivity {
 
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private DatabaseReference mFirebaseDatabaseReference;
+    //private FirebaseRecyclerAdapter<>;
+    private String mUsername = "ANONYMOUS";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
@@ -61,6 +73,7 @@ public class BaseActivity extends AppCompatActivity {
         if (id == R.id.login) {
             Log.d("test", "logging in");
             startActivity(new Intent(this, AuthenticationActivity.class));
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

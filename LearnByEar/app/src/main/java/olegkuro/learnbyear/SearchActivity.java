@@ -1,6 +1,7 @@
 package olegkuro.learnbyear;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -83,6 +84,9 @@ public class SearchActivity extends BaseActivity
         upButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                //Toast toast = Toast.makeText(getApplicationContext(), R.string.thanks_for_appending, Toast.LENGTH_LONG);
+                //toast.setGravity(Gravity.CENTER, 0, 0);
+                //toast.show();
                 searchResults.scrollToPosition(0);
             }
         });
