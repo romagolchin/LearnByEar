@@ -8,7 +8,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import olegkuro.learnbyear.auth.AuthenticationActivity;
 import olegkuro.learnbyear.auth.SignedInActivity;
@@ -16,10 +20,15 @@ import olegkuro.learnbyear.auth.SignedInActivity;
 public class BaseActivity extends AppCompatActivity {
 
     protected final String TAG = getClass().getSimpleName();
-
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private DatabaseReference mFirebaseDatabaseReference;
+    //private FirebaseRecyclerAdapter<>;
+    private String mUsername = "ANONYMOUS";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu){

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import olegkuro.learnbyear.loaders.search.SearchResult;
+import retrofit2.http.HEAD;
 
 /**
  * Created by Roman on 12/12/2016.

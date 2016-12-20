@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +27,8 @@ import java.util.List;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchLoader;
 import olegkuro.learnbyear.loaders.search.SearchResult;
+import retrofit2.http.HEAD;
+
 
 /**
  * Created by Елена on 07.12.2016.
@@ -41,7 +46,9 @@ public class SearchActivity extends BaseActivity
     RecyclerView searchResults;
     private String request;
     private RecyclerView.LayoutManager layoutManager = null;
-
+    private LinearLayoutManager manager;
+    private DatabaseReference databaseReference;
+    private FirebaseDatabase firebaseDatabase;
 
     private void setVisibilityOnError() {
         searchResults.setVisibility(View.GONE);
@@ -88,14 +95,23 @@ public class SearchActivity extends BaseActivity
                 }
             }
         });
-        //simply turns back to the first item
         upButton = (Button) findViewById(R.id.button_up);
-        upButton.setOnClickListener(new View.OnClickListener() {
+        //simply turns back to the first item
+        upButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                Log.d("test","scrolling up");
+                //databaseReference = FirebaseDatabase.getInstance().getReference();
+                //Log.d("test", "database connected");
+                //databaseReference.child("lyrics").setValue(new Lyrics("english", "ya lublu sobak", "MC Panin"));
+                //Toast toast = Toast.makeText(getApplicationContext(), R.string.thanks_for_appending, Toast.LENGTH_LONG);
+                //toast.setGravity(Gravity.CENTER, 0, 0);
+                //toast.show();
+
                 searchResults.scrollToPosition(0);
             }
         });
+
         searchResults.setLayoutManager(new LinearLayoutManager(this));
         layoutManager = searchResults.getLayoutManager();
         searchResults.setAdapter(adapter);
@@ -186,13 +202,18 @@ public class SearchActivity extends BaseActivity
         searchResults.setVisibility(View.GONE);
     }
 
-    private void testResult() {
-        if (data.isEmpty()) {
-            try {
-                data.add(new SearchResult("Black beatles", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
+    private void testResult(){
+        if (data.isEmpty()){
+            for (int i = 1; i < 20; i++) {
+                try {
+                    data.add(new SearchResult("Animals", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
                 setVisibilityOnResult();
                 adapter = new SearchResultAdapter(this);
                 adapter.setData(data);
+                searchResults.setAdapter(adapter);
                 adapter.setListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(int lineNumber, int index) {
@@ -205,11 +226,8 @@ public class SearchActivity extends BaseActivity
                         startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
                     }
                 });
-                searchResults.setAdapter(adapter);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                finish();
             }
         }
+        upButton.bringToFront();
     }
 }
