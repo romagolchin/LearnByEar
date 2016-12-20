@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -58,6 +59,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         if (id == R.id.login) {
+            Log.d("test", "logging in");
             startActivity(new Intent(this, AuthenticationActivity.class));
         }
         return super.onOptionsItemSelected(item);
