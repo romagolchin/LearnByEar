@@ -42,7 +42,7 @@ public class SearchResultAdapter extends CommonAdapter<SearchResult> {
         }
 
         public static SearchResultHolder newInstance(ViewGroup parent, LayoutInflater inflater) {
-            View itemView = inflater.inflate(R.layout.search_result_item, parent);
+            View itemView = inflater.inflate(R.layout.search_result_item, parent, false);
             return new SearchResultHolder(itemView);
         }
     }

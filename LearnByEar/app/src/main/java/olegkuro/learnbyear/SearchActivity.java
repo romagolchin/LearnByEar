@@ -7,7 +7,9 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +41,7 @@ public class SearchActivity extends BaseActivity
     RecyclerView searchResults;
     private String request;
     private RecyclerView.LayoutManager layoutManager = null;
-
+    private LinearLayoutManager manager;
 
     private void setVisibilityOnError() {
         searchResults.setVisibility(View.GONE);
@@ -60,7 +62,9 @@ public class SearchActivity extends BaseActivity
         data = new ArrayList<>();
         setContentView(R.layout.searchlist);
         searchResults = (RecyclerView) findViewById(R.id.search_results);
-        layoutManager = searchResults.getLayoutManager();
+        manager = new LinearLayoutManager(this);
+        searchResults.setLayoutManager(manager);
+        //Log.d("test", layoutManager.toString());
         searchButton = (Button) findViewById(R.id.start_search);
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -76,18 +80,19 @@ public class SearchActivity extends BaseActivity
                 getSupportLoaderManager().initLoader(0, args, SearchActivity.this);
             }
         });
-        testResult();
-        //simply turns back to the first item
         upButton = (Button) findViewById(R.id.button_up);
+        //simply turns back to the first item
         upButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                Log.d("test","scrolling up");
                 //Toast toast = Toast.makeText(getApplicationContext(), R.string.thanks_for_appending, Toast.LENGTH_LONG);
                 //toast.setGravity(Gravity.CENTER, 0, 0);
                 //toast.show();
                 searchResults.scrollToPosition(0);
             }
         });
+        testResult();
     }
 
     @Override
@@ -161,28 +166,30 @@ public class SearchActivity extends BaseActivity
 
     private void testResult(){
         if (data.isEmpty()){
+            for (int i = 1; i < 20; i++)
             try {
-                data.add(new SearchResult("Black beatles", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
-                setVisibilityOnResult();
-                adapter = new SearchResultAdapter(this);
-                adapter.setData(data);
-                adapter.setListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int lineNumber, int index) {
-
-                    }
-
-                    @Override
-                    public void onItemClick(int position) {
-                        URL url = data.get(position).url;
-                        startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
-                    }
-                });
-                searchResults.setAdapter(adapter);
+                data.add(new SearchResult("Animals", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
-                finish();
             }
+            setVisibilityOnResult();
+            adapter = new SearchResultAdapter(this);
+            adapter.setData(data);
+            searchResults.setAdapter(adapter);
+            adapter.setListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(int lineNumber, int index) {
+
+                }
+
+                @Override
+                public void onItemClick(int position) {
+                    URL url = data.get(position).url;
+                    startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
+                }
+            });
+
         }
+        upButton.bringToFront();
     }
 }

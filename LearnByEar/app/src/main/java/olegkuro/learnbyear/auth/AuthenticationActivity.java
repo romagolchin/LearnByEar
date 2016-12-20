@@ -32,7 +32,6 @@ public class AuthenticationActivity extends BaseActivity {
                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
                     new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
                 .setLogo(R.drawable.firebase_auth_120dp).build(), RC_SIGNIN);
-
     }
 
     @Override
