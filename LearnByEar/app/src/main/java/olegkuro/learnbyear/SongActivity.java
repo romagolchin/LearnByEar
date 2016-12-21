@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import olegkuro.learnbyear.auth.AuthenticationActivity;
+import olegkuro.learnbyear.model.Lyrics;
 
 /**
  * Created by Елена on 07.12.2016.
@@ -37,6 +40,8 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
     private List<String> translation = new ArrayList<>();
     private List<String> all = new ArrayList<>();
     private LyricsAdapter adapter;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference mFirebaseDatabaseReference;
 
     private class Word {
         public String word;
@@ -98,6 +103,9 @@ public class SongActivity extends BaseActivity implements Button.OnClickListener
             }
             case R.id.submit_gloss_btn: {
                 //TODO save to database
+                mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                //here we'll add class lyrics
+                //mFirebaseDatabaseReference.child("lyrics").setValue();
                 break;
             }
             case R.id.preview_gloss_btn: {

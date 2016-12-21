@@ -16,6 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.List;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchLoader;
 import olegkuro.learnbyear.loaders.search.SearchResult;
+import olegkuro.learnbyear.model.Lyrics;
 
 /**
  * Created by Елена on 07.12.2016.
@@ -42,6 +46,8 @@ public class SearchActivity extends BaseActivity
     private String request;
     private RecyclerView.LayoutManager layoutManager = null;
     private LinearLayoutManager manager;
+    private DatabaseReference databaseReference;
+    private FirebaseDatabase firebaseDatabase;
 
     private void setVisibilityOnError() {
         searchResults.setVisibility(View.GONE);
@@ -86,9 +92,13 @@ public class SearchActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 Log.d("test","scrolling up");
+                //databaseReference = FirebaseDatabase.getInstance().getReference();
+                //Log.d("test", "database connected");
+                //databaseReference.child("lyrics").setValue(new Lyrics("english", "ya lublu sobak", "MC Panin"));
                 //Toast toast = Toast.makeText(getApplicationContext(), R.string.thanks_for_appending, Toast.LENGTH_LONG);
                 //toast.setGravity(Gravity.CENTER, 0, 0);
                 //toast.show();
+
                 searchResults.scrollToPosition(0);
             }
         });

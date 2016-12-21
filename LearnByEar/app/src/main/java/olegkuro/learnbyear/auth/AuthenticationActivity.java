@@ -38,8 +38,10 @@ public class AuthenticationActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("test", "RESULT");
         Log.d("test", new Integer(resultCode).toString());
+        //Suddenly (data == null) if authorized via google
+        // google - RESULTCANCELLED
         if (data == null) return;
-
+        Log.d("test", data.toString());
         switch(resultCode) {
             case RESULT_OK: {
                 Intent intent = new Intent(this, SignedInActivity.class);
@@ -56,7 +58,6 @@ public class AuthenticationActivity extends BaseActivity {
                 Snackbar.make(findViewById(android.R.id.content),
                         getString(R.string.error_no_network), Snackbar.LENGTH_LONG);
             }
-
         }
     }
 }
