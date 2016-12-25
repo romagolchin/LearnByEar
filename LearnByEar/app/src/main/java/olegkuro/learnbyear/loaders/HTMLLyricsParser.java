@@ -1,74 +1,89 @@
 package olegkuro.learnbyear.loaders;
 
+import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.facebook.stetho.urlconnection.StethoURLConnectionManager;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
+import olegkuro.learnbyear.utils.CommonUtils;
+import olegkuro.learnbyear.utils.NetworkUtils;
 
 
 /**
  * Created by Roman on 11/12/2016.
+ * now azlyrics is used
  */
 
 public class HTMLLyricsParser {
     private final String TAG = getClass().getSimpleName();
-    private static final String BASE_URI = "http://lyricstranslate.com/";
-    private boolean found = false;
+    private static final String BASE_URI = "http://search.azlyrics.com/search.php";
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    Context context;
 
 
-    public ArrayList<SearchResult> search(String query, List<String> langCodesTo) {
+    @NonNull
+    public LoadResult<List<SearchResult>> search(String query) {
+        final StethoURLConnectionManager manager = new StethoURLConnectionManager("LearnByEar");
+        LoadResult.ResultType type = LoadResult.ResultType.UNKNOWN_ERROR;
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon();
-        ArrayList<String> urls = new ArrayList<>();
-        ArrayList<SearchResult> searchResults = new ArrayList<>();
-        ArrayList<String> headers;
-//        for (String langTo : langCodesTo) {
-//            try {
-//                builder.appendPath(langTo).appendPath("site-search").appendQueryParameter("query", query)
-//                        .appendQueryParameter("op", "Search");
-//                String anchor = "#gsc.tab=0&gsc.q=" + URLEncoder.encode(query, "UTF-8") + "&gsc.page=1";
-//                String url = builder.build().toString() + anchor;
-//                Log.d(TAG + " request", url);
-//                WebClient client = new WebClient();
-//                WebRequest request = new WebRequest(new URL(url));
-//                HtmlPage page = client.getPage(request);
-//                client.getOptions().setJavaScriptEnabled(true);
-//                for (int i = 0; i < 5; ++i) {
-//                    int res = client.waitForBackgroundJavaScript(1000);
-//                }
-//                List<?> links = page.getByXPath("//a[@class=gs-per-result-labels]");
-//                Log.d(TAG + " links size", String.valueOf(links.size()));
-//                String songUrl;
-//                boolean isLyricsUrl = false;
-//                for (int i = 0; i < links.size(); ++i) {
-//                    if (links.get(i) instanceof DomElement) {
-//                        DomElement link = (DomElement) links.get(i);
-//                        String title = link.getTextContent();
-//                        songUrl = link.getAttribute("href");
-//                        // assume it's a page of a musician
-//                        if (songUrl.substring(songUrl.length() - 12, 12).equals("-lyrics.html"))
-//                            continue;
-//                        int cnt = 0;
-//                        String path = new URL(songUrl).getPath();
-//                        for (int j = 0; j < path.length(); ++j) {
-//                            char c = path.charAt(j);
-//                            if (c == '/')
-//                                ++cnt;
-//                        }
-//                        if (cnt != 1)
-//                            continue;
-//                        found = true;
-//                        searchResults.add(new SearchResult(title, new URL(songUrl)));
-//                    }
-//                }
-//            } catch (Exception e) {
-//                Log.d(TAG, "", e);
-//            }
-//
-//        }
-        return searchResults;
+        List<SearchResult> searchResults = new ArrayList<>();
+
+        try {
+            builder.appendQueryParameter("q", URLEncoder.encode(query, "UTF-8").replace("+", " "));
+        } catch (UnsupportedEncodingException e) {
+        }
+        if (NetworkUtils.isConnectionAvailable(context)) {
+            try {
+                String url = builder.build().toString();
+                Log.d(TAG + " request", url);
+                Document doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .referrer("http://www.google.com")
+                        .get();
+                Elements panels = doc.getElementsByClass("panel");
+                for (Element panel : panels) {
+                    Element heading = panel.getElementsByClass("panel-heading").first();
+                    String header = heading.getElementsByTag("b").first().ownText();
+                    if (header != null && header.toLowerCase().contains("song")) {
+                        Elements songs = panel.getElementsByClass("text-left");
+                        for (Element song : songs) {
+                            Element link = song.getElementsByTag("a").first();
+                            String songUrl = link.attr("href");
+                            String title = link.text();
+                            String artist = song.getElementsByTag("b").get(1).ownText();
+                            searchResults.add(new SearchResult(title, CommonUtils.capitalize(artist), new URL(songUrl)));
+                        }
+                    }
+                }
+                type = searchResults.isEmpty() ? LoadResult.ResultType.EMPTY : LoadResult.ResultType.OK;
+            } catch (Exception e) {
+                Log.d(TAG, "", e);
+            }
+        } else {
+            type = LoadResult.ResultType.NO_NETWORK;
+        }
+        return new LoadResult<>(searchResults, type);
+
     }
 
     public Lyrics parse(String url) {

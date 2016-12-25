@@ -27,7 +27,6 @@ import java.util.List;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchLoader;
 import olegkuro.learnbyear.loaders.search.SearchResult;
-import retrofit2.http.HEAD;
 
 
 /**
@@ -115,6 +114,7 @@ public class SearchActivity extends BaseActivity
         searchResults.setLayoutManager(new LinearLayoutManager(this));
         layoutManager = searchResults.getLayoutManager();
         searchResults.setAdapter(adapter);
+        adapter.setData(data);
     }
 
     @Override
@@ -137,6 +137,7 @@ public class SearchActivity extends BaseActivity
             loaderInit = savedInstanceState.getBoolean("loaderInit");
             try {
                 data = (List<SearchResult>) savedInstanceState.getSerializable("data");
+                adapter.setData(data);
             } catch(ClassCastException e) {}
             if (data != null)
                 System.out.println(data.size());
@@ -170,9 +171,6 @@ public class SearchActivity extends BaseActivity
                     if (posResult != null) {
                         if (posResult.reference != null)
                             intent.putExtra("reference", (Serializable) posResult.reference);
-                        else {
-                            intent.putExtra("trackId", posResult.trackId).putExtra("albumId", posResult.albumId);
-                        }
                     }
                     startActivity(intent);
                 }
@@ -206,7 +204,7 @@ public class SearchActivity extends BaseActivity
         if (data.isEmpty()){
             for (int i = 1; i < 20; i++) {
                 try {
-                    data.add(new SearchResult("Animals", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
+                    data.add(new SearchResult("Animals", "Animals", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

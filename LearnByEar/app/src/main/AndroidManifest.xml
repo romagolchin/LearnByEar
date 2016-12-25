@@ -6,33 +6,31 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".LearnByEarApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
         -->
+
         <activity
             android:name=".SongActivity"
             android:label="Song"
             android:parentActivityName=".SearchActivity"/>
         <activity
             android:name=".SearchActivity"
-            android:label="Search" />
+            android:label="Search" >
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".auth.AuthenticationActivity" />
-        <activity android:name="com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".auth.SignedInActivity" />
         <activity android:name=".RulesActivity"

@@ -1,4 +1,4 @@
-package olegkuro.learnbyear;
+package olegkuro.learnbyear.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

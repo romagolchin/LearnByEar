@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import olegkuro.learnbyear.auth.AuthenticationActivity;
-import olegkuro.learnbyear.model.Lyrics;
 
 /**
  * Created by Елена on 07.12.2016.

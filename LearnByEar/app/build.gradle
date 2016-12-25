@@ -56,7 +56,11 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.android.support:design:25.1.0'
-//    compile 'net.sourceforge.htmlunit:htmlunit:2.23'
+    compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.facebook.stetho:stetho:1.4.1'
+    compile 'com.facebook.stetho:stetho-urlconnection:1.4.1'
+//    compile 'org.apache.commons:commons-lang3:3.5'
+    //    compile 'net.sourceforge.htmlunit:htmlunit:2.23'
     // Crashlytics Kit
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true

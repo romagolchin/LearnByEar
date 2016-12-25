@@ -8,10 +8,10 @@ import android.util.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.List;
 
 import olegkuro.learnbyear.loaders.HTMLLyricsParser;
+import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
 
 import static org.junit.Assert.assertEquals;
@@ -34,10 +34,9 @@ public class ExampleInstrumentedTest {
     @Test
     public void testHTMLParse() throws Exception {
         HTMLLyricsParser parser = new HTMLLyricsParser();
-        List<SearchResult> searchResults = parser.search("bob dylan", Arrays.asList("en"));
-        if (searchResults != null) {
-            for (SearchResult searchResult : searchResults)
-                Log.d(getClass().getSimpleName(), searchResult.toString());
-        }
+        parser.setContext(InstrumentationRegistry.getTargetContext());
+        LoadResult<List<SearchResult>> loadResult = parser.search("bob dylan");
+        for (SearchResult searchResult : loadResult.data)
+            Log.d(getClass().getSimpleName(), searchResult.toString());
     }
 }
