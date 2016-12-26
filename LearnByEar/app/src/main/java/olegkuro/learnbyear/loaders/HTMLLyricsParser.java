@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.facebook.stetho.urlconnection.StethoURLConnectionManager;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,13 +41,13 @@ public class HTMLLyricsParser {
 
     @NonNull
     public LoadResult<List<SearchResult>> search(String query) {
-        final StethoURLConnectionManager manager = new StethoURLConnectionManager("LearnByEar");
         LoadResult.ResultType type = LoadResult.ResultType.UNKNOWN_ERROR;
         Uri.Builder builder = Uri.parse(BASE_URI).buildUpon();
         List<SearchResult> searchResults = new ArrayList<>();
-
         try {
-            builder.appendQueryParameter("q", URLEncoder.encode(query, "UTF-8").replace("+", " "));
+            builder.appendQueryParameter("q", URLEncoder.encode(query, "UTF-8").replace("+", " "))
+                .appendQueryParameter("p", "1")
+                .appendQueryParameter("w", "songs");
         } catch (UnsupportedEncodingException e) {
         }
         if (NetworkUtils.isConnectionAvailable(context)) {
@@ -60,20 +58,14 @@ public class HTMLLyricsParser {
                         .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                         .referrer("http://www.google.com")
                         .get();
-                Elements panels = doc.getElementsByClass("panel");
-                for (Element panel : panels) {
-                    Element heading = panel.getElementsByClass("panel-heading").first();
-                    String header = heading.getElementsByTag("b").first().ownText();
-                    if (header != null && header.toLowerCase().contains("song")) {
-                        Elements songs = panel.getElementsByClass("text-left");
-                        for (Element song : songs) {
-                            Element link = song.getElementsByTag("a").first();
-                            String songUrl = link.attr("href");
-                            String title = link.text();
-                            String artist = song.getElementsByTag("b").get(1).ownText();
-                            searchResults.add(new SearchResult(title, CommonUtils.capitalize(artist), new URL(songUrl)));
-                        }
-                    }
+                Element panel = doc.getElementsByClass("panel").first();
+                Elements songs = panel.getElementsByClass("text-left");
+                for (Element song : songs) {
+                    Element link = song.getElementsByTag("a").first();
+                    String songUrl = link.attr("href");
+                    String title = link.text();
+                    String artist = song.getElementsByTag("b").get(1).ownText();
+                    searchResults.add(new SearchResult(title, CommonUtils.capitalize(artist), new URL(songUrl)));
                 }
                 type = searchResults.isEmpty() ? LoadResult.ResultType.EMPTY : LoadResult.ResultType.OK;
             } catch (Exception e) {
