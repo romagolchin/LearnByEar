@@ -20,6 +20,7 @@ public class Lyrics implements Serializable{
     public List<String> lyrics;
     public List<String> translation;
     public TranslationType typeOfTranslation;
+    public String user;
     public Lyrics(String language, String artist, List<String> lyrics, String title,
                   String translatedTitle, List<String> translation,
                   String translationLanguage, TranslationType typeOfTranslation) {

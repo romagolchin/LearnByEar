@@ -174,7 +174,7 @@ public class SearchActivity extends BaseActivity
                     startActivity(intent);
                 }
             });
-
+        upButton.bringToFront();
         } else {
             setVisibilityOnError();
             String errorMessage = "";
@@ -190,7 +190,6 @@ public class SearchActivity extends BaseActivity
                     break;
             }
             showToast(errorMessage);
-
         }
     }
 
@@ -199,6 +198,7 @@ public class SearchActivity extends BaseActivity
         searchResults.setVisibility(View.GONE);
     }
 
+    /*
     private void testResult(){
         if (data.isEmpty()){
             for (int i = 1; i < 20; i++) {
@@ -227,4 +227,5 @@ public class SearchActivity extends BaseActivity
         }
         upButton.bringToFront();
     }
+    */
 }
