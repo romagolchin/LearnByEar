@@ -20,6 +20,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
+        multiDexEnabled true
         applicationId "olegkuro.learnbyear"
         minSdkVersion 17
         targetSdkVersion 25

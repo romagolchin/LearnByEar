@@ -23,7 +23,7 @@
             android:parentActivityName=".SearchActivity"/>
         <activity
             android:name=".SearchActivity"
-            android:label="Search" >
+            android:label="LearnByEar" >
             <intent-filter>
 
                 <action android:name="android.intent.action.MAIN"/>
