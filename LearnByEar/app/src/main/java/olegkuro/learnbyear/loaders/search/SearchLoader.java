@@ -25,7 +25,6 @@ import olegkuro.learnbyear.model.Lyrics;
 public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>> {
     private LoadResult<List<SearchResult>> result;
     private final String TAG = getClass().getSimpleName();
-    private static final String BASE_URI = "https://music.yandex.ru/handlers/music-search.jsx";
     private String request;
     private List<String> langCodesTo;
 
@@ -57,7 +56,7 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
             return;
         else {
             for (SearchResult song : val.data ){
-                Lyrics lyrics = new Lyrics("eng", song.artist, null, song.title, null, null, null, Lyrics.TranslationType.MACHINE);
+                Lyrics lyrics = new Lyrics("eng", song.artist, null, song.title, null, null, null, Lyrics.TranslationType.MACHINE, null);
                 Pair <Lyrics, String> app;
                 if (firebaseUser != null)
                     app = new Pair<>(lyrics, firebaseUser.getDisplayName());

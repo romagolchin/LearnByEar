@@ -13,6 +13,7 @@ import java.util.List;
 import olegkuro.learnbyear.loaders.HTMLLyricsParser;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
+import olegkuro.learnbyear.model.Lyrics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,6 +38,8 @@ public class ExampleInstrumentedTest {
         parser.setContext(InstrumentationRegistry.getTargetContext());
         LoadResult<List<SearchResult>> loadResult = parser.search("bob dylan");
         for (SearchResult searchResult : loadResult.data)
-            Log.d(getClass().getSimpleName(), searchResult.toString());
+            Log.d(getClass().getSimpleName(), searchResult.title);
+        LoadResult<Lyrics> lyrics = parser.parse(loadResult.data.get(0).url.toString());
+        Log.d(getClass().getSimpleName(), lyrics.data.lyrics);
     }
 }

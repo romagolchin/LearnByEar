@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -31,6 +32,8 @@ import olegkuro.learnbyear.utils.NetworkUtils;
 public class HTMLLyricsParser {
     private final String TAG = getClass().getSimpleName();
     private static final String BASE_URI = "http://search.azlyrics.com/search.php";
+    private static final String userAgent = "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6";
+    private static final String referrer = "http://www.google.com";
 
     public void setContext(Context context) {
         this.context = context;
@@ -46,8 +49,8 @@ public class HTMLLyricsParser {
         List<SearchResult> searchResults = new ArrayList<>();
         try {
             builder.appendQueryParameter("q", URLEncoder.encode(query, "UTF-8").replace("+", " "))
-                .appendQueryParameter("p", "1")
-                .appendQueryParameter("w", "songs");
+                    .appendQueryParameter("p", "1")
+                    .appendQueryParameter("w", "songs");
         } catch (UnsupportedEncodingException e) {
         }
         if (NetworkUtils.isConnectionAvailable(context)) {
@@ -55,8 +58,8 @@ public class HTMLLyricsParser {
                 String url = builder.build().toString();
                 Log.d(TAG + " request", url);
                 Document doc = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                        .referrer("http://www.google.com")
+                        .userAgent(userAgent)
+                        .referrer(referrer)
                         .get();
                 Element panel = doc.getElementsByClass("panel").first();
                 Elements songs = panel.getElementsByClass("text-left");
@@ -78,43 +81,42 @@ public class HTMLLyricsParser {
 
     }
 
-    public Lyrics parse(String url) {
-//        try {
-//            WebClient client = new WebClient();
-//            WebRequest request = new WebRequest(new URL(url));
-//            HtmlPage page = client.getPage(request);
-//            client.getOptions().setJavaScriptEnabled(true);
-//            DomElement content = page.getElementById("content-area");
-//            DomElement translationArea = content.getFirstByXPath("//div[@class=translate-node-text]");
-//            DomElement info = translationArea.getFirstByXPath("//div[@class=info-line-left]");
-//            String translationLanguage = info.getTextContent();
-//            Log.d(TAG + " translationLanguage", translationLanguage);
-//            int index = -1;
-//            for (int i = 0; i < translationLanguage.length(); ++i) {
-//                Character c = translationLanguage.charAt(i);
-//                if (Character.isUpperCase(c))
-//                    index = i;
-//            }
-//            if (index >= 0)
-//                translationLanguage = translationLanguage.substring(index);
-//
-//            String translatedTitle = ((DomElement) translationArea.getFirstByXPath("//h2[@class=title-h2]")).getTextContent();
-//            ArrayList<String> translation = new ArrayList<>();
-//            for (DomElement line : (List<DomElement>) (((DomElement) translationArea).getByXPath("par"))) {
-//                translation.add(line.getTextContent());
-//            }
-//            DomElement lyricsArea = content.getFirstByXPath("//div[@class=song-node-text]");
-//            String language = ( (DomElement) lyricsArea.getFirstByXPath("//div[@class=info-line-left]")).getTextContent();
-//            String title = ((DomElement) lyricsArea.getFirstByXPath("//h2[@class=title-h2]")).getTextContent();
-//            ArrayList<String> lyrics = new ArrayList<>();
-//            for (DomElement line : (List<DomElement>) lyricsArea.getByXPath("par")) {
-//                lyrics.add(line.getTextContent());
-//            }
-//            return new Lyrics(language, null, lyrics, title,
-//                    translatedTitle, translation, translationLanguage, Lyrics.TranslationType.HUMAN);
-//        } catch (IOException e) {
-//            Log.d(TAG, "", e);
-//        }
-        return null;
+
+    public LoadResult<Lyrics> parse(String url) {
+        Log.d(TAG + " url", url);
+        LoadResult.ResultType resultType = LoadResult.ResultType.UNKNOWN_ERROR;
+        String lyrics = "";
+        try {
+            if (NetworkUtils.isConnectionAvailable(context)) {
+                Document doc = Jsoup.connect(url)
+                        .userAgent(userAgent).referrer(referrer).get();
+                Element text = doc.getElementsByClass("main-page").first()
+                        .getElementsByClass("row").first()
+                        .child(1);
+                Elements divs = text.getElementsByTag("div");
+                Element div = divs.select("div:not([class])").first();
+                String[] lyricsList = div.html().split("<br>");
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < lyricsList.length; ++i) {
+                    Log.d("", lyricsList[i]);
+                    // if it isn't a comment
+                    int commentStart = -1;
+                    int commentEnd = -1;
+                    if ((commentStart = lyricsList[i].indexOf("<!--")) >= 0) {
+                        commentEnd = lyricsList[i].indexOf("-->");
+                        builder.append(lyricsList[i].substring(Math.max(commentStart + 4, commentEnd + 3)));
+                    } else {
+                        builder.append(lyricsList[i]);
+                    }
+                }
+                lyrics = new String(builder);
+                resultType = lyrics.isEmpty() ? LoadResult.ResultType.EMPTY : LoadResult.ResultType.OK;
+            } else {
+                resultType = LoadResult.ResultType.NO_NETWORK;
+            }
+        } catch (IOException e) {
+            Log.d(TAG, "", e);
+        }
+        return new LoadResult<>(new Lyrics(lyrics), resultType);
     }
 }
