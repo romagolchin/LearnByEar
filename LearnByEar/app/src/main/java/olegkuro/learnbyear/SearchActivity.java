@@ -114,7 +114,6 @@ public class SearchActivity extends BaseActivity
         searchResults.setLayoutManager(new LinearLayoutManager(this));
         layoutManager = searchResults.getLayoutManager();
         searchResults.setAdapter(adapter);
-        adapter.setData(data);
     }
 
     @Override
