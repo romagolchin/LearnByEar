@@ -14,4 +14,9 @@ public class User {
     float rating;
     List<String> nativeLanguages;
     List<String> languagesToStudy;
+
+    @Override
+    public String toString() {
+        return Integer.toString(id) + " " + displayName;
+    }
 }
