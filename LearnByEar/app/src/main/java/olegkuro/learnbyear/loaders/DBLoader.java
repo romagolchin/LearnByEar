@@ -40,8 +40,8 @@ public class DBLoader {
 
     @NonNull
     public LoadResult<List<SearchResult>> search(final String request){
-        LoadResult.ResultType type = LoadResult.ResultType.UNKNOWN_ERROR;
-        final List<SearchResult> searchResults = new ArrayList<>();
+        LoadResult.ResultType type = LoadResult.ResultType.EMPTY;
+        final List<SearchResult>searchResults = new ArrayList<>();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         //// FIXME: 28.12.2016
@@ -51,8 +51,12 @@ public class DBLoader {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.getChildren()){
                     Map<String, Pair<Lyrics, String>> map = (Map <String, Pair<Lyrics, String>>) d.getValue();
+                    if (map.get(request) == null)
+                        break;
                     Pair<Lyrics, String> pair = (Pair<Lyrics, String>) map.get(request);
                     searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
+                    if (pair!= null)
+                        searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
                     }
                 }
 
@@ -61,7 +65,7 @@ public class DBLoader {
                 Log.w(TAG, databaseError.toException());
             }
         });
-        
+
         //TODO: поиск по исполнителю
         /*
         databaseReference.child("db").addValueEventListener(new ValueEventListener() {

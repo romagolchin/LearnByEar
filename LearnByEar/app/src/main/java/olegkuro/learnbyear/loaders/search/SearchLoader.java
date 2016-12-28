@@ -65,7 +65,7 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
                 else
                     app = new Pair<>(lyrics, "ANONYMOUS");
                 Log.d(TAG, app.toString());
-                mDatabase.child("db").child(lyrics.artist).child(lyrics.title).setValue(app);
+                mDatabase.child("db").child(lyrics.artist.replaceAll("[\\[\\]#$.]", "")).child(lyrics.title.replaceAll("[\\[\\]#$.]", "")).setValue(app);
             }
         }
     }
@@ -74,14 +74,18 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
     public LoadResult<List<SearchResult>> loadInBackground() {
         DBLoader dbLoader = new DBLoader();
         dbLoader.setContext(this.getContext());
-        LoadResult<List<SearchResult>> searchRes = dbLoader.search(request);
+       LoadResult<List<SearchResult>> searchRes;
+        searchRes = dbLoader.search(request);
         if (searchRes.type != LoadResult.ResultType.EMPTY)
             return searchRes;
         else {
+            Log.d("Using html", "PARSIM");
             HTMLLyricsParser htmlLyricsParser = new HTMLLyricsParser();
             htmlLyricsParser.setContext(this.getContext());
             searchRes = htmlLyricsParser.search(request);
-            appendDB(searchRes);
+            Log.d(TAG, searchRes.type.toString());
+            if (searchRes.data != null)
+                appendDB(searchRes);
             return searchRes;
         }
     }
