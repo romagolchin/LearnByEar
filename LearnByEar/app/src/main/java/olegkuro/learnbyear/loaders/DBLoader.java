@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import olegkuro.learnbyear.loaders.search.*;
 import olegkuro.learnbyear.model.Lyrics;
@@ -38,53 +39,44 @@ public class DBLoader {
 
 
     @NonNull
-    public LoadResult<List<SearchResult>> search(String request){
+    public LoadResult<List<SearchResult>> search(final String request){
         LoadResult.ResultType type = LoadResult.ResultType.UNKNOWN_ERROR;
         final List<SearchResult> searchResults = new ArrayList<>();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        Query queryArtist =databaseReference.orderByChild("db").startAt(request);
-        Query queryTitle = databaseReference.orderByChild("db").startAt(request);
+        //// FIXME: 28.12.2016
 
-        queryArtist.addValueEventListener(new ValueEventListener() {
+        databaseReference.child("db").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        Pair<Lyrics, String> pair = (Pair<Lyrics, String>) d.getValue();
-                        String translator = pair.second;
-                        Lyrics lyrics = pair.first;
-                        searchResults.add(castLyricsToSearchRes(lyrics,translator));
+                for (DataSnapshot d : dataSnapshot.getChildren()){
+                    Map<String, Pair<Lyrics, String>> map = (Map <String, Pair<Lyrics, String>>) d.getValue();
+                    Pair<Lyrics, String> pair = (Pair<Lyrics, String>) map.get(request);
+                    searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
                     }
                 }
-            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, databaseError.toException());
             }
         });
-        if (!searchResults.isEmpty())
-            return new LoadResult<>(searchResults, LoadResult.ResultType.OK);
-
-        queryTitle.addValueEventListener(new ValueEventListener() {
+        
+        //TODO: поиск по исполнителю
+        /*
+        databaseReference.child("db").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        Pair<Lyrics, String> pair = (Pair<Lyrics, String>) d.getValue();
-                        String translator = pair.second;
-                        Lyrics lyrics = pair.first;
-                        searchResults.add(castLyricsToSearchRes(lyrics,translator));
-                    }
-                }
+                Map<String, Map<String, Pair<Lyrics, String>>> db = (Map<String, Map<String, Pair<Lyrics, String>>>) dataSnapshot;
+                Log.w(TAG, "succesfull cast");
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, databaseError.toException());
+
             }
         });
+        */
         if (!searchResults.isEmpty())
             return new LoadResult<>(searchResults, LoadResult.ResultType.OK);
         else
