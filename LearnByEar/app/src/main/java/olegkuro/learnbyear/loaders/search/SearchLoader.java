@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
+import olegkuro.learnbyear.loaders.DBLoader;
 import olegkuro.learnbyear.loaders.HTMLLyricsParser;
 
 import olegkuro.learnbyear.model.Lyrics;
@@ -71,10 +72,17 @@ public class SearchLoader extends AsyncTaskLoader<LoadResult<List<SearchResult>>
 
     @Override
     public LoadResult<List<SearchResult>> loadInBackground() {
-        HTMLLyricsParser htmlLyricsParser = new HTMLLyricsParser();
-        htmlLyricsParser.setContext(this.getContext());
-        LoadResult<List<SearchResult>> searchRes = htmlLyricsParser.search(request);
-        appendDB(searchRes);
-        return searchRes;
+        DBLoader dbLoader = new DBLoader();
+        dbLoader.setContext(this.getContext());
+        LoadResult<List<SearchResult>> searchRes = dbLoader.search(request);
+        if (searchRes.type != LoadResult.ResultType.EMPTY)
+            return searchRes;
+        else {
+            HTMLLyricsParser htmlLyricsParser = new HTMLLyricsParser();
+            htmlLyricsParser.setContext(this.getContext());
+            searchRes = htmlLyricsParser.search(request);
+            appendDB(searchRes);
+            return searchRes;
+        }
     }
 }
