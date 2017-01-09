@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,7 +36,6 @@ public class SearchActivity extends BaseActivity
     private boolean loaderInit = false;
     private Parcelable recyclerState;
     List<SearchResult> data;
-    Button upButton;
     Button searchButton;
     EditText searchField;
     private SearchResultAdapter adapter;
@@ -93,12 +91,12 @@ public class SearchActivity extends BaseActivity
                 }
             }
         });
-        upButton = (Button) findViewById(R.id.button_up);
+//        upButton = (Button) findViewById(R.id.button_up);
         //simply turns back to the first item
-        upButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Log.d("test","scrolling up");
+//        upButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view) {
+//                Log.d("test","scrolling up");
                 //databaseReference = FirebaseDatabase.getInstance().getReference();
                 //Log.d("test", "database connected");
                 //databaseReference.child("lyrics").setValue(new Lyrics("english", "ya lublu sobak", "MC Panin"));
@@ -106,9 +104,9 @@ public class SearchActivity extends BaseActivity
                 //toast.setGravity(Gravity.CENTER, 0, 0);
                 //toast.show();
 
-                searchResults.scrollToPosition(0);
-            }
-        });
+//                searchResults.scrollToPosition(0);
+//            }
+//        });
 
         searchResults.setLayoutManager(new LinearLayoutManager(this));
         layoutManager = searchResults.getLayoutManager();
@@ -173,7 +171,7 @@ public class SearchActivity extends BaseActivity
                     startActivity(intent);
                 }
             });
-        upButton.bringToFront();
+//        upButton.bringToFront();
         } else {
             setVisibilityOnError();
             String errorMessage = "";

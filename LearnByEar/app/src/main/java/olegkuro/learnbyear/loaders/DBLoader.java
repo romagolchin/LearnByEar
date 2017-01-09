@@ -2,9 +2,7 @@
 package olegkuro.learnbyear.loaders;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -14,14 +12,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import olegkuro.learnbyear.loaders.search.*;
+import olegkuro.learnbyear.loaders.search.LoadResult;
+import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
 
 /**
@@ -53,7 +51,7 @@ public class DBLoader {
                     Map<String, Pair<Lyrics, String>> map = (Map <String, Pair<Lyrics, String>>) d.getValue();
                     if (map.get(request) == null)
                         break;
-                    Pair<Lyrics, String> pair = (Pair<Lyrics, String>) map.get(request);
+                    Pair<Lyrics, String> pair = map.get(request);
                     searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
                     if (pair!= null)
                         searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
