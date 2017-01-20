@@ -8,7 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
     <style name="OrdinaryButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/mybutton</item>
         <item name="android:color">@color/colorPrimary</item>
+        <item name="android:layout_margin">5dp</item>
     </style>
     <style name="WarnButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:background">@color/md_red_200</item>

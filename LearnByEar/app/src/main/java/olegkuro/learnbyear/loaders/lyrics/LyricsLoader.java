@@ -1,25 +1,35 @@
 package olegkuro.learnbyear.loaders.lyrics;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 
-import java.util.List;
-
+import olegkuro.learnbyear.loaders.HTMLLyricsParser;
 import olegkuro.learnbyear.loaders.search.LoadResult;
-import olegkuro.learnbyear.model.Lyrics;
+import olegkuro.learnbyear.model.UserEdit;
 
 /**
  * Created by Roman on 18/12/2016.
- * gets lyrics by url / database reference, now for testing lyrics are retrieved form raw files
  */
 
-public class LyricsLoader extends AsyncTaskLoader<LoadResult<List<Lyrics>>> {
-    public LyricsLoader(Context context) {
+public class LyricsLoader extends AsyncTaskLoader<LoadResult<UserEdit>> {
+    private String url;
+
+    public LyricsLoader(Context context, Bundle args) {
         super(context);
+        url = args.getString("url");
+    }
+
+
+    @Override
+    protected void onStartLoading() {
+        forceLoad();
     }
 
     @Override
-    public LoadResult<List<Lyrics>> loadInBackground() {
-        return null;
+    public LoadResult<UserEdit> loadInBackground() {
+        HTMLLyricsParser parser = new HTMLLyricsParser();
+        parser.setContext(getContext());
+        return parser.parse(url);
     }
 }

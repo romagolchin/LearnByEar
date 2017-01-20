@@ -43,7 +43,6 @@ android {
 
 
 dependencies {
-//    compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

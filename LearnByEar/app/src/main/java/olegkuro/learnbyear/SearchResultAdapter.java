@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import olegkuro.learnbyear.loaders.search.SearchResult;
+import olegkuro.learnbyear.utils.CommonUtils;
 
 /**
  * Created by Roman on 12/12/2016.
@@ -26,7 +27,7 @@ public class SearchResultAdapter extends CommonAdapter<SearchResult> {
     public void onBindVHImpl(CommonViewHolder holder, int position) {
         if (holder instanceof SearchResultHolder) {
             SearchResult searchResult = data.get(position);
-            ((SearchResultHolder) holder).title.setText(searchResult.artist + " \u2014 "+ searchResult.title);
+            ((SearchResultHolder) holder).title.setText(searchResult.artist + CommonUtils.longDash + searchResult.title);
             ((SearchResultHolder) holder).author.setText(searchResult.author);
         }
     }

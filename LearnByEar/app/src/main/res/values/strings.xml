@@ -27,4 +27,7 @@
     <string name="submit_gloss">Submit</string>
     <string name="deselect">Deselect all</string>
 
+    <string name="native_languages">Select your native languages</string>
+    <string name="learn_languages">Select the languages you learn</string>
+
 </resources>

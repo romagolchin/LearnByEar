@@ -15,13 +15,16 @@ import com.google.firebase.database.DatabaseReference;
 import olegkuro.learnbyear.auth.AuthenticationActivity;
 import olegkuro.learnbyear.auth.SignedInActivity;
 
+/**
+ * a way to avoid implementing menu in all activities
+ */
+
 public class BaseActivity extends AppCompatActivity {
 
     protected final String TAG = getClass().getSimpleName();
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mFirebaseDatabaseReference;
-    //private FirebaseRecyclerAdapter<>;
     private String mUsername = "ANONYMOUS";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +42,20 @@ public class BaseActivity extends AppCompatActivity {
         int id = item.getItemId();
 
 
-        //Change Language
+        //Change Languages
+        if (id == R.id.language) {
+            if (!LanguageActivity.class.equals(getClass())) {
+                Intent intent = new Intent(this, LanguageActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        }
+
         if (id == R.id.search_song){
             if (!SearchActivity.class.equals(getClass())) {
                 Intent intent = new Intent(this, SearchActivity.class);
                 startActivity(intent);
-                return true; //poisk pesni sobsna
+                return true;
             }
         }
 
@@ -74,6 +85,7 @@ public class BaseActivity extends AppCompatActivity {
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 if (auth.getCurrentUser() != null) {
                     startActivity(new Intent(this, SignedInActivity.class));
+                    return super.onOptionsItemSelected(item);
                 }
                 Log.d("test", "logging in");
                 startActivity(new Intent(this, AuthenticationActivity.class));

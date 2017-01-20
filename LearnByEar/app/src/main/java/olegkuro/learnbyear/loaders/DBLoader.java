@@ -2,8 +2,7 @@
 package olegkuro.learnbyear.loaders;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,86 +17,123 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import olegkuro.learnbyear.loaders.search.LoadResult;
+import javax.annotation.Nullable;
+
 import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
+import olegkuro.learnbyear.model.UserEdit;
 
 /**
  * Created by Елена on 27.12.2016.
  */
 
 public class DBLoader {
-    private String request;
-    private LoadResult<List<SearchResult>> result;
-    private final String TAG = getClass().getSimpleName();
+    private final String TAG = "DBLoader";
     private List<String> langCodesTo;
+    private static final String fullClassName = "olegkuro.learnbyear.loaders.DBLoader";
+    public static final String searchInDBFinishedAction = fullClassName + ".DB_SEARCH_FINISHED";
+    public static final String lyricsLoadedFromDBAction = fullClassName + ".DB_LYRICS_LOADED";
 
-    DatabaseReference databaseReference;
-    FirebaseUser firebaseUser;
+    DatabaseReference mDatabaseReference;
+    FirebaseUser mFirebaseUser;
 
 
-    @NonNull
-    public LoadResult<List<SearchResult>> search(final String request){
-        LoadResult.ResultType type = LoadResult.ResultType.EMPTY;
-        final List<SearchResult>searchResults = new ArrayList<>();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    public DBLoader(Context context) {
+        this.context = context;
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    }
+
+    private Context context;
+
+    public void search(final String request, final List<String> langCodesTo) {
+        final List<SearchResult> searchResults = new ArrayList<>();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         //// FIXME: 28.12.2016
-
-        databaseReference.child("db").addValueEventListener(new ValueEventListener() {
+        final String[] tokens = request.toLowerCase().split("[^A-Za-z'-]");
+        mDatabaseReference.child("index").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot d : dataSnapshot.getChildren()){
-                    Map<String, Pair<Lyrics, String>> map = (Map <String, Pair<Lyrics, String>>) d.getValue();
-                    if (map.get(request) == null)
-                        break;
-                    Pair<Lyrics, String> pair = map.get(request);
-                    searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
-                    if (pair!= null)
-                        searchResults.add(castLyricsToSearchRes(pair.first,pair.second));
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Map<String, ?> map = (Map<String, ?>) d.getValue();
+                    String artist = ((String) map.get("artist"));
+                    boolean artistContains = false;
+                    for (String t : tokens) {
+                        if (artist.toLowerCase().contains(t)) {
+                            artistContains = true;
+                            break;
+                        }
                     }
+                    String title = ((String) map.get("title"));
+                    boolean titleContains = false;
+                    for (String t : tokens) {
+                        if (title.toLowerCase().contains(t)) {
+                            titleContains = true;
+                            break;
+                        }
+
+                    }
+                    if (artistContains || titleContains) {
+                        boolean translationLanguageAvailable = false;
+                        @Nullable
+                        Map<String, Boolean> translationLanguages = (Map<String, Boolean>) map.get("translationLanguages");
+                        for (String langCode : langCodesTo)
+                            if (translationLanguages != null && translationLanguages.containsKey(langCode)) {
+                                translationLanguageAvailable = true;
+                                break;
+                            }
+                        if (translationLanguageAvailable) {
+                            SearchResult result = new SearchResult(title, artist, null);
+                            result.setReference(mDatabaseReference.child("lyrics/" + d.getKey()));
+                            searchResults.add(result);
+                        }
+                    }
+
                 }
+                Intent intent = new Intent(searchInDBFinishedAction);
+                intent.putParcelableArrayListExtra("databaseResults", new ArrayList<>(searchResults));
+                context.sendBroadcast(intent);
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, databaseError.toException());
             }
         });
-
-        //TODO: поиск по исполнителю
-        /*
-        databaseReference.child("db").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Map<String, Pair<Lyrics, String>>> db = (Map<String, Map<String, Pair<Lyrics, String>>>) dataSnapshot;
-                Log.w(TAG, "succesfull cast");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        */
-        if (!searchResults.isEmpty())
-            return new LoadResult<>(searchResults, LoadResult.ResultType.OK);
-        else
-            // nothing found in db
-            return new LoadResult<>(null, LoadResult.ResultType.EMPTY);
     }
 
-    public SearchResult castLyricsToSearchRes(Lyrics lyrics, String translator){
+    public SearchResult castLyricsToSearchRes(Lyrics lyrics, String translator) {
         SearchResult ret = new SearchResult(lyrics.title, lyrics.artist, null);
         ret.author = translator;
-        ret.reference = FirebaseDatabase.getInstance().getReference().child("db");
+        ret.reference = FirebaseDatabase.getInstance().getReference().child("artists");
         return ret;
     }
+
     public void setContext(Context context) {
         this.context = context;
     }
 
-    Context context;
-    public String getUser(){
-        return firebaseUser.getDisplayName();
+    public String getUser() {
+        return mFirebaseUser.getDisplayName();
     }
+
+    public void loadLyrics(DatabaseReference reference) {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UserEdit userEdit = dataSnapshot.getValue(UserEdit.class);
+                Log.d(TAG, userEdit.language + " "
+                        + userEdit.translationLanguage + " " + userEdit.lyrics);
+                Intent intent = new Intent(lyricsLoadedFromDBAction);
+                intent.putExtra("userEdit", userEdit);
+                context.sendBroadcast(intent);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, databaseError.toException());
+            }
+        });
+    }
+
 }

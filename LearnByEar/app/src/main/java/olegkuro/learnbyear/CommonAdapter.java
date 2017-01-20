@@ -18,7 +18,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
     // RecyclerView has no OnItemClickListener (unlike ListView) so custom listener is used
     protected OnItemClickListener listener;
     protected LayoutInflater inflater;
-    protected List<T> data = new ArrayList<T>();
+    protected List<T> data = new ArrayList<>();
 
     public void clear() {
         int size = this.data.size();
@@ -73,6 +73,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
                         listener.onItemClick(position);
                 }
             });
+            bindImpl();
         }
 
         public void bindImpl() {}

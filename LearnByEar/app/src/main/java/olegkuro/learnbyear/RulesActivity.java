@@ -7,6 +7,10 @@ import android.view.MenuItem;
 
 import java.util.List;
 
+/**
+ * activity for searching, adding and editing grammar rules
+ */
+
 public class RulesActivity extends BaseActivity {
     static class Rule {
         public String name;
@@ -28,10 +32,6 @@ public class RulesActivity extends BaseActivity {
 
             }
 
-            @Override
-            public void onItemClick(int lineNumber, int index) {
-
-            }
         });
     }
 

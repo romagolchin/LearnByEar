@@ -10,7 +10,7 @@
         android:icon="@drawable/bckgr"
         android:id="@+id/firebase_menu" /> -->
     <item
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:orderInCategory="1"
         android:title="@string/search"
         android:id="@+id/search_song"

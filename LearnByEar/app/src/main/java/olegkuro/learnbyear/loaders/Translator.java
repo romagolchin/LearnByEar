@@ -12,8 +12,10 @@ import olegkuro.learnbyear.loaders.search.LoadResult;
 public class Translator extends AsyncTaskLoader<LoadResult<String>> {
     private String langFrom;
     private String langTo;
-    public Translator(Context context) {
+    private String toTranslate;
+    public Translator(Context context, String toTranslate) {
         super(context);
+        this.toTranslate = toTranslate;
     }
 
     public void setLanguages(String langFrom, String langTo) {

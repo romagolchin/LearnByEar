@@ -15,11 +15,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
+import olegkuro.learnbyear.model.UserEdit;
 import olegkuro.learnbyear.utils.CommonUtils;
 import olegkuro.learnbyear.utils.NetworkUtils;
 
@@ -82,10 +84,11 @@ public class HTMLLyricsParser {
     }
 
 
-    public LoadResult<Lyrics> parse(String url) {
+    public LoadResult<UserEdit> parse(String url) {
         Log.d(TAG + " url", url);
         LoadResult.ResultType resultType = LoadResult.ResultType.UNKNOWN_ERROR;
         String lyrics = "";
+        List<String> lines = new ArrayList<>();
         try {
             if (NetworkUtils.isConnectionAvailable(context)) {
                 Document doc = Jsoup.connect(url)
@@ -95,18 +98,21 @@ public class HTMLLyricsParser {
                         .child(1);
                 Elements divs = text.getElementsByTag("div");
                 Element div = divs.select("div:not([class])").first();
-                String[] lyricsList = div.html().split("<br>");
+                String[] lyricsArray = div.html().split("<br>");
                 StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < lyricsList.length; ++i) {
-                    Log.d("", lyricsList[i]);
-                    // if it isn't a comment
+                lines = new ArrayList<>(Arrays.asList(lyricsArray));
+                for (int i = 0; i < lyricsArray.length; ++i) {
+                    Log.d("", lyricsArray[i]);
+                    // exclude html comment
                     int commentStart = -1;
                     int commentEnd = -1;
-                    if ((commentStart = lyricsList[i].indexOf("<!--")) >= 0) {
-                        commentEnd = lyricsList[i].indexOf("-->");
-                        builder.append(lyricsList[i].substring(Math.max(commentStart + 4, commentEnd + 3)));
+                    if ((commentStart = lyricsArray[i].indexOf("<!--")) >= 0) {
+                        commentEnd = lyricsArray[i].indexOf("-->");
+                        String withoutComment = lyricsArray[i].substring(Math.max(commentStart + 4, commentEnd + 3));
+                        builder.append(withoutComment);
+                        lines.set(i, withoutComment);
                     } else {
-                        builder.append(lyricsList[i]);
+                        builder.append(lyricsArray[i]);
                     }
                 }
                 lyrics = new String(builder);
@@ -117,6 +123,7 @@ public class HTMLLyricsParser {
         } catch (IOException e) {
             Log.d(TAG, "", e);
         }
-        return new LoadResult<>(new Lyrics(lyrics), resultType);
+        UserEdit edit = new UserEdit(null, Lyrics.MACHINE, null, null, null, lines, lyrics, null);
+        return new LoadResult<>(edit, resultType);
     }
 }

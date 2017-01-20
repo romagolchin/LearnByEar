@@ -1,9 +1,11 @@
 package olegkuro.learnbyear;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,10 +20,10 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import olegkuro.learnbyear.loaders.DBLoader;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchLoader;
 import olegkuro.learnbyear.loaders.search.SearchResult;
@@ -33,13 +35,14 @@ import olegkuro.learnbyear.loaders.search.SearchResult;
 
 public class SearchActivity extends BaseActivity
         implements LoaderManager.LoaderCallbacks<LoadResult<List<SearchResult>>> {
+    private BroadcastReceiver receiver;
     private boolean loaderInit = false;
     private Parcelable recyclerState;
-    List<SearchResult> data;
+    List<SearchResult> searchResults;
     Button searchButton;
     EditText searchField;
     private SearchResultAdapter adapter;
-    RecyclerView searchResults;
+    RecyclerView recyclerSearchResults;
     private String request;
     private RecyclerView.LayoutManager layoutManager = null;
     private LinearLayoutManager manager;
@@ -47,11 +50,11 @@ public class SearchActivity extends BaseActivity
     private FirebaseDatabase firebaseDatabase;
 
     private void setVisibilityOnError() {
-        searchResults.setVisibility(View.GONE);
+        recyclerSearchResults.setVisibility(View.GONE);
     }
 
     private void setVisibilityOnResult() {
-        searchResults.setVisibility(View.VISIBLE);
+        recyclerSearchResults.setVisibility(View.VISIBLE);
     }
 
     private void showToast(String message) {
@@ -63,16 +66,38 @@ public class SearchActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        data = new ArrayList<>();
         setContentView(R.layout.searchlist);
-        searchResults = (RecyclerView) findViewById(R.id.search_results);
+        if (layoutManager == null)
+            layoutManager = new LinearLayoutManager(this);
+        if (adapter == null)
+            adapter = new SearchResultAdapter(this);
+        if (savedInstanceState != null) {
+            request = (String) savedInstanceState.get("request");
+            recyclerState = savedInstanceState.getParcelable("adapter");
+            layoutManager.onRestoreInstanceState(recyclerState);
+            loaderInit = savedInstanceState.getBoolean("loaderInit");
+            try {
+                searchResults =
+                        savedInstanceState.getParcelableArrayList("searchResults");
+                adapter.setData(searchResults);
+
+            } catch (ClassCastException e) {
+            }
+            if (searchResults != null) {
+                System.out.println(searchResults.size());
+            }
+        } else {
+            searchResults = new ArrayList<>();
+            adapter = new SearchResultAdapter(this);
+        }
+        recyclerSearchResults = (RecyclerView) findViewById(R.id.search_results);
         searchButton = (Button) findViewById(R.id.start_search);
-        adapter = new SearchResultAdapter(this);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 searchField = (EditText) findViewById(R.id.request);
-                if (searchField.getText() != null && searchField.getText().toString().equals(request)) {
+                if (searchField.getText() == null ||
+                        searchField.getText().toString().toLowerCase().equals(request)) {
                     return;
                 }
                 request = searchField.getText().toString();
@@ -91,54 +116,51 @@ public class SearchActivity extends BaseActivity
                 }
             }
         });
-//        upButton = (Button) findViewById(R.id.button_up);
-        //simply turns back to the first item
-//        upButton.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view) {
-//                Log.d("test","scrolling up");
-                //databaseReference = FirebaseDatabase.getInstance().getReference();
-                //Log.d("test", "database connected");
-                //databaseReference.child("lyrics").setValue(new Lyrics("english", "ya lublu sobak", "MC Panin"));
-                //Toast toast = Toast.makeText(getApplicationContext(), R.string.thanks_for_appending, Toast.LENGTH_LONG);
-                //toast.setGravity(Gravity.CENTER, 0, 0);
-                //toast.show();
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                List<SearchResult> databaseResults = intent.getExtras().getParcelableArrayList("databaseResults");
+            }
+        };
+        recyclerSearchResults.setLayoutManager(layoutManager);
+        recyclerSearchResults.setAdapter(adapter);
+    }
 
-//                searchResults.scrollToPosition(0);
-//            }
-//        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(DBLoader.searchInDBFinishedAction));
+        adapter.setListener(new OnItemClickListener() {
 
-        searchResults.setLayoutManager(new LinearLayoutManager(this));
-        layoutManager = searchResults.getLayoutManager();
-        searchResults.setAdapter(adapter);
+            @Override
+            public void onItemClick(int position) {
+                Log.d(TAG + " onItemClick position", String.valueOf(position));
+                SearchResult selectedResult = searchResults.get(position);
+                Intent intent = new Intent(SearchActivity.this, SongActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                if (selectedResult != null) {
+                    intent.putExtra("searchResult", selectedResult);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // only UI is saved, whereas data is saved in Loader
         super.onSaveInstanceState(outState);
         if (layoutManager != null)
             outState.putParcelable("adapter", layoutManager.onSaveInstanceState());
         outState.putBoolean("loaderInit", loaderInit);
-        outState.putSerializable("data", (Serializable) data);
+        outState.putParcelableArrayList("searchResults", new ArrayList<>(searchResults));
     }
 
-    @Override
-    protected void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null) {
-            recyclerState = savedInstanceState.getParcelable("adapter");
-            if (layoutManager != null)
-                layoutManager.onRestoreInstanceState(recyclerState);
-            loaderInit = savedInstanceState.getBoolean("loaderInit");
-            try {
-                data = (List<SearchResult>) savedInstanceState.getSerializable("data");
-                adapter.setData(data);
-            } catch(ClassCastException e) {}
-            if (data != null)
-                System.out.println(data.size());
-        }
-    }
 
     @Override
     public Loader<LoadResult<List<SearchResult>>> onCreateLoader(int id, Bundle args) {
@@ -152,26 +174,9 @@ public class SearchActivity extends BaseActivity
         if (result.type == LoadResult.ResultType.OK) {
             setVisibilityOnResult();
             adapter.setData(result.data);
-            data = result.data;
+            searchResults = result.data;
             Log.d(getClass().getSimpleName() + " getItemCount", String.valueOf(adapter.getItemCount()));
-            adapter.setListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(int lineNumber, int index) {
 
-                }
-                @Override
-                public void onItemClick(int position) {
-                    Log.d(TAG + " onItemClick position", String.valueOf(position));
-                    SearchResult posResult = result.data.get(position);
-                    Intent intent = new Intent(SearchActivity.this, SongActivity.class);
-                    if (posResult != null) {
-                        if (posResult.reference != null)
-                            intent.putExtra("reference", (Serializable) posResult.reference);
-                    }
-                    startActivity(intent);
-                }
-            });
-//        upButton.bringToFront();
         } else {
             setVisibilityOnError();
             String errorMessage = "";
@@ -192,37 +197,13 @@ public class SearchActivity extends BaseActivity
 
     @Override
     public void onLoaderReset(Loader<LoadResult<List<SearchResult>>> loader) {
-        searchResults.setVisibility(View.GONE);
+        recyclerSearchResults.setVisibility(View.GONE);
     }
 
-    /*
-    private void testResult(){
-        if (data.isEmpty()){
-            for (int i = 1; i < 20; i++) {
-                try {
-                    data.add(new SearchResult("Animals", "Animals", new URL("http://lyricstranslate.com/en/animals-%D0%B6%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B5.html-0")));
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                setVisibilityOnResult();
-                adapter = new SearchResultAdapter(this);
-                adapter.setData(data);
-                searchResults.setAdapter(adapter);
-                adapter.setListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int lineNumber, int index) {
-
-                    }
-
-                    @Override
-                    public void onItemClick(int position) {
-                        URL url = data.get(position).url;
-                        startActivity(new Intent(SearchActivity.this, SongActivity.class).putExtra("url", url));
-                    }
-                });
-            }
-        }
-        upButton.bringToFront();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "stop");
     }
-    */
+
 }

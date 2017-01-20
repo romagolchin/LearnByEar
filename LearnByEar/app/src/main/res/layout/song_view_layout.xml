@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/bckgr"
     android:orientation="vertical">
 
@@ -12,33 +12,25 @@
     <!-- non-scrolling top pane -->
     <!-- here we display song name and singer -->
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="0dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:paddingTop="15dp">
+        android:paddingTop="5dp">
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Here we may add detalized info about song show ratings..."
-            android:textColor="@color/H1"
-            android:textSize="20dp" />
 
         <Button
-
             android:id="@+id/edit_button"
-            style="@style/Widget.AppCompat.Button.Colored"
+            style="@style/OrdinaryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Edit" />
+            android:text="@string/edit" />
 
         <Button
             android:id="@+id/submit_gloss_btn"
+            style="@style/OrdinaryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -47,6 +39,7 @@
 
         <Button
             android:id="@+id/preview_gloss_btn"
+            style="@style/OrdinaryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -54,14 +47,28 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/artist_and_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/H1"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"/>
+
     <!-- scrolling bottom pane -->
     <!-- here we need to upload song text -->
-    <EditText
-        android:layout_height="wrap_content"
+    <ScrollView
         android:layout_width="match_parent"
-        android:id="@+id/original_text">
+        android:layout_height="wrap_content">
 
-    </EditText>
+        <EditText
+            android:id="@+id/original_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        </EditText>
+    </ScrollView>
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -75,18 +82,24 @@
             app:behavior_hideable="true"
             app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
+
+            <EditText
+                android:id="@+id/translated_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="this is a test" />
             <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content">-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
             <!--</LinearLayout>-->
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/meaning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/meaning"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
 
-            </android.support.v7.widget.RecyclerView>
+            <!--</android.support.v7.widget.RecyclerView>-->
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
 

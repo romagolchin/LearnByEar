@@ -35,18 +35,18 @@
 
     <!--</LinearLayout>-->
 
-    <Button
-        android:id="@+id/button_up"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:background="@drawable/mybutton"
-        android:gravity="center"
-        android:padding="5dip"
-        android:layout_marginBottom="10dp"
-        android:text="@string/up" />
+    <!--<Button-->
+        <!--android:id="@+id/button_up"-->
+        <!--style="@style/Widget.AppCompat.Button.Colored"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:background="@drawable/mybutton"-->
+        <!--android:gravity="center"-->
+        <!--android:padding="5dip"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:text="@string/up" />-->
 
     <EditText
         android:id="@+id/request"
