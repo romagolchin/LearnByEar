@@ -66,7 +66,7 @@ public class SearchResult implements Parcelable {
 
         @Override
         public SearchResult[] newArray(int i) {
-            return new SearchResult[0];
+            return new SearchResult[i];
         }
     };
 

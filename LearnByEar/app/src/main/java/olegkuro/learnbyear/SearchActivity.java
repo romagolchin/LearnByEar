@@ -17,11 +17,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import olegkuro.learnbyear.loaders.DBLoader;
 import olegkuro.learnbyear.loaders.search.LoadResult;
@@ -45,9 +46,8 @@ public class SearchActivity extends BaseActivity
     RecyclerView recyclerSearchResults;
     private String request;
     private RecyclerView.LayoutManager layoutManager = null;
-    private LinearLayoutManager manager;
-    private DatabaseReference databaseReference;
-    private FirebaseDatabase firebaseDatabase;
+    private boolean loadedFromDb = false;
+    private boolean loadedFromInternet = false;
 
     private void setVisibilityOnError() {
         recyclerSearchResults.setVisibility(View.GONE);
@@ -63,6 +63,37 @@ public class SearchActivity extends BaseActivity
         toast.show();
     }
 
+    private class ResultComparator implements Comparator<SearchResult> {
+        @Override
+        public int compare(SearchResult sr, SearchResult otherSr) {
+            int res = sr.artist.compareTo(otherSr.artist);
+            if (res == 0)
+                res = sr.title.compareTo(otherSr.title);
+            if (res == 0) {
+                if (otherSr.reference == null && sr.reference != null)
+                    res = 1;
+                else if (otherSr.reference != null && sr.reference == null)
+                    res = -1;
+            }
+            return res;
+        }
+    }
+
+    private ArrayList<SearchResult> filterResults(List<SearchResult> searchResults) {
+        Log.d(TAG, "before filter " + String.valueOf(searchResults.size()));
+        List<SearchResult> resultsToFilter = new LinkedList<>(searchResults);
+        SearchResult prev = null;
+        ListIterator<SearchResult> iterator = resultsToFilter.listIterator();
+        while (iterator.hasNext()) {
+            SearchResult result = iterator.next();
+            if (prev != null && prev.artist.equals(result.artist) && prev.title.equals(result.title))
+                iterator.remove();
+            prev = result;
+        }
+        Log.d(TAG, "after filter " + String.valueOf(resultsToFilter.size()));
+        return new ArrayList<>(resultsToFilter);
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +103,8 @@ public class SearchActivity extends BaseActivity
         if (adapter == null)
             adapter = new SearchResultAdapter(this);
         if (savedInstanceState != null) {
+            loadedFromDb = (boolean) savedInstanceState.get("loadedFromDb");
+            loadedFromInternet = (boolean) savedInstanceState.get("loadedFromInternet");
             request = (String) savedInstanceState.get("request");
             recyclerState = savedInstanceState.getParcelable("adapter");
             layoutManager.onRestoreInstanceState(recyclerState);
@@ -97,7 +130,7 @@ public class SearchActivity extends BaseActivity
             public void onClick(View view) {
                 searchField = (EditText) findViewById(R.id.request);
                 if (searchField.getText() == null ||
-                        searchField.getText().toString().toLowerCase().equals(request)) {
+                        request != null && searchField.getText().toString().toLowerCase().equals(request.toLowerCase())) {
                     return;
                 }
                 request = searchField.getText().toString();
@@ -108,6 +141,8 @@ public class SearchActivity extends BaseActivity
                 adapter.clear();
                 Bundle args = new Bundle();
                 args.putString("request", request);
+                args.putBoolean("loadedFromDb", loadedFromDb);
+                args.putBoolean("loadedFromInternet", loadedFromInternet);
                 if (!loaderInit) {
                     getSupportLoaderManager().initLoader(0, args, SearchActivity.this);
                     loaderInit = true;
@@ -120,6 +155,11 @@ public class SearchActivity extends BaseActivity
             @Override
             public void onReceive(Context context, Intent intent) {
                 List<SearchResult> databaseResults = intent.getExtras().getParcelableArrayList("databaseResults");
+                if (databaseResults != null)
+                    searchResults.addAll(databaseResults);
+                Collections.sort(searchResults, new ResultComparator());
+                searchResults = filterResults(searchResults);
+                loadedFromDb = true;
             }
         };
         recyclerSearchResults.setLayoutManager(layoutManager);
@@ -129,7 +169,8 @@ public class SearchActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(receiver, new IntentFilter(DBLoader.searchInDBFinishedAction));
+        IntentFilter intentFilter = new IntentFilter(DBLoader.searchInDBFinishedAction);
+        registerReceiver(receiver, intentFilter);
         adapter.setListener(new OnItemClickListener() {
 
             @Override
@@ -159,6 +200,8 @@ public class SearchActivity extends BaseActivity
             outState.putParcelable("adapter", layoutManager.onSaveInstanceState());
         outState.putBoolean("loaderInit", loaderInit);
         outState.putParcelableArrayList("searchResults", new ArrayList<>(searchResults));
+        outState.putBoolean("loadedFromDb", loadedFromDb);
+        outState.putBoolean("loadedFromInternet", loadedFromInternet);
     }
 
 
@@ -174,9 +217,13 @@ public class SearchActivity extends BaseActivity
         if (result.type == LoadResult.ResultType.OK) {
             setVisibilityOnResult();
             adapter.setData(result.data);
-            searchResults = result.data;
+            if (searchResults == null)
+                searchResults = new ArrayList<>();
+            searchResults.addAll(result.data);
             Log.d(getClass().getSimpleName() + " getItemCount", String.valueOf(adapter.getItemCount()));
-
+            Collections.sort(searchResults, new ResultComparator());
+            searchResults = filterResults(searchResults);
+            loadedFromInternet = true;
         } else {
             setVisibilityOnError();
             String errorMessage = "";

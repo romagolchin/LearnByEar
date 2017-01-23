@@ -104,8 +104,7 @@ public class HTMLLyricsParser {
                 for (int i = 0; i < lyricsArray.length; ++i) {
                     Log.d("", lyricsArray[i]);
                     // exclude html comment
-                    int commentStart = -1;
-                    int commentEnd = -1;
+                    int commentStart, commentEnd;
                     if ((commentStart = lyricsArray[i].indexOf("<!--")) >= 0) {
                         commentEnd = lyricsArray[i].indexOf("-->");
                         String withoutComment = lyricsArray[i].substring(Math.max(commentStart + 4, commentEnd + 3));
@@ -116,6 +115,8 @@ public class HTMLLyricsParser {
                     }
                 }
                 lyrics = new String(builder);
+                // exclude HTML tags
+                lyrics = lyrics.replaceAll("<[a-z]+>|</[a-z]+>|&amp;", "");
                 resultType = lyrics.isEmpty() ? LoadResult.ResultType.EMPTY : LoadResult.ResultType.OK;
             } else {
                 resultType = LoadResult.ResultType.NO_NETWORK;

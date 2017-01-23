@@ -4,17 +4,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,13 +26,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import olegkuro.learnbyear.auth.AuthenticationActivity;
 import olegkuro.learnbyear.loaders.DBLoader;
+import olegkuro.learnbyear.loaders.TranslationLoader;
 import olegkuro.learnbyear.loaders.lyrics.LyricsLoader;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
@@ -37,6 +42,7 @@ import olegkuro.learnbyear.model.Lyrics;
 import olegkuro.learnbyear.model.UserEdit;
 import olegkuro.learnbyear.utils.CommonUtils;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static olegkuro.learnbyear.loaders.search.LoadResult.ResultType.OK;
 
 /**
@@ -44,10 +50,17 @@ import static olegkuro.learnbyear.loaders.search.LoadResult.ResultType.OK;
  */
 
 public class SongActivity extends BaseActivity
-        implements LoaderManager.LoaderCallbacks<LoadResult<UserEdit>>,
-        Button.OnClickListener {
+        implements Button.OnClickListener {
+    @IntDef({VIEW, EDIT})
+    public @interface Mode {
+    }
+
+    public static final int VIEW = 0;
+    public static final int EDIT = 1;
+    @Mode
+    private int mode = VIEW;
     private TextView artistAndTitle;
-    protected LinearLayout grammarSheet;
+    protected LinearLayout translationSheet;
     protected EditText originalText;
     protected EditText translatedText;
 
@@ -57,21 +70,84 @@ public class SongActivity extends BaseActivity
     // stores line beginnings in lyrics to determine line number by position in string
     // that contains whole lyrics
     private List<Integer> lineBeginnings = new ArrayList<>();
+    private List<Integer> translationLineBeginnings = new ArrayList<>();
+
     // i maps to j when word that starts at position i ends at j
     private SparseArrayCompat<Integer> wordEnd = new SparseArrayCompat<>();
     private List<Integer> wordIndices = new ArrayList<>();
     private List<String> translationLines = new ArrayList<>();
     private List<String> originalLines;
-    private Lyrics lyrics;
     private UserEdit userEdit;
     private final String TAG = getClass().getSimpleName();
     private FirebaseAuth mAuth;
-    private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
     private SearchResult searchResult;
-
-    private List<Selection> selections;
+    private Integer lyricsLineNumber;
     private DBLoader dbLoader;
+
+    private List<Integer> getLineBeginnings(List<String> lines) {
+        List<Integer> result = new ArrayList<>();
+        int index = 0;
+        for (String line : lines)
+            if (!line.isEmpty() && !"\n".equals(line)) {
+                result.add(index);
+                index += line.length();
+            }
+        return result;
+    }
+
+    private LoaderManager.LoaderCallbacks<LoadResult<UserEdit>> mLyricsLoaderCallbacks =
+            new LoaderManager.LoaderCallbacks<LoadResult<UserEdit>>() {
+                @Override
+                public Loader<LoadResult<UserEdit>> onCreateLoader(int id, Bundle args) {
+                    return new LyricsLoader(SongActivity.this, args);
+                }
+
+                @Override
+                public void onLoadFinished(Loader<LoadResult<UserEdit>> loader, LoadResult<UserEdit> result
+                ) {
+                    if (result.type == OK) {
+                        userEdit = result.data;
+                        originalLines = userEdit.lines;
+                        displayNonEmptyData();
+                        lineBeginnings = getLineBeginnings(originalLines);
+                        Collections.sort(lineBeginnings);
+                    }
+                }
+
+                @Override
+                public void onLoaderReset(Loader<LoadResult<UserEdit>> loader) {
+
+                }
+            };
+    private LoaderManager.LoaderCallbacks<LoadResult<String>> mTranslationCallbacks = new LoaderManager.LoaderCallbacks<LoadResult<String>>() {
+        @Override
+        public Loader<LoadResult<String>> onCreateLoader(int id, Bundle args) {
+            return new TranslationLoader(SongActivity.this, userEdit.lyrics.replaceAll("\\n", "\r\n"),
+                    userEdit.translationLanguage);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<LoadResult<String>> loader, LoadResult<String> data) {
+            if (data.type == OK) {
+                String translation = data.data;
+                // exclude XML tag
+                int begin = translation.indexOf('>') + 1;
+                int end = translation.lastIndexOf('<') - 1;
+                if (end >= begin)
+                    translation = translation.substring(begin, end);
+                userEdit.translatedText = translation;
+                translationLines = new ArrayList<>(Arrays.asList(translation.split("\\r\\n")));
+                translationLineBeginnings = getLineBeginnings(translationLines);
+                showTranslation();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<LoadResult<String>> loader) {
+
+        }
+    };
 
     static class BundleSparseIntArrayConverter {
 
@@ -109,75 +185,39 @@ public class SongActivity extends BaseActivity
         }
     }
 
-    private class Selection {
-
-        public List<WordCoordinates> wordCoordinates;
+    private void getTranslation() {
+        if ((userEdit.translatedText == null || userEdit.translatedText.isEmpty()) &&
+                userEdit.translationLanguage != null)
+            getSupportLoaderManager().initLoader(1, null, mTranslationCallbacks);
     }
 
-    @Override
-    public void onLoaderReset(Loader<LoadResult<UserEdit>> loader) {
-
-    }
-
-
-    @Override
-    public void onLoadFinished(Loader<LoadResult<UserEdit>> loader, LoadResult<UserEdit> result) {
-        if (result.type == OK) {
-            userEdit = result.data;
-            //todo: translate lyrics and update DB
-            updateDB();
-            originalLines = userEdit.lines;
-            displayNonEmptyData();
-            String delimiter = " |\\n";
-            String[] splitLyrics = userEdit.lyrics.split("(?<=" + delimiter + ")|(?="
-                    + delimiter + ")");
-            int index = 0;
-            for (int i = 0; i < splitLyrics.length; ++i) {
-                String token = splitLyrics[i];
-                Log.d(TAG + " token", token);
-                if (!token.isEmpty() && !token.matches(delimiter)) {
-                    wordEnd.put(index, index + token.length() - 1);
-                    wordIndices.add(index);
-                }
-                index += token.length();
-            }
-            index = 0;
-            for (String line : originalLines) {
-                lineBeginnings.add(index);
-                index += line.length();
-            }
-            Collections.sort(wordIndices);
-            Collections.sort(lineBeginnings);
-        }
-    }
-
-    @Override
-    public Loader<LoadResult<UserEdit>> onCreateLoader(int id, Bundle args) {
-        return new LyricsLoader(this, args);
+    private void showTranslation() {
+        updateDB();
+        translatedText.setText(userEdit.translatedText);
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dbLoader = new DBLoader(this);
         setContentView(R.layout.song_view_layout);
-        Button editButton = (Button) findViewById(R.id.edit_button);
-        editButton.setOnClickListener(this);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             Log.d(TAG, "logged in");
         } else
             Log.d(TAG, "not logged in");
-        grammarSheet = (LinearLayout) findViewById(R.id.grammar_sheet);
         originalText = (EditText) findViewById(R.id.original_text);
         translatedText = (EditText) findViewById(R.id.translated_text);
-        BottomSheetBehavior.from(grammarSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+        if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
+            translationSheet = (LinearLayout) findViewById(R.id.translation_sheet);
+            BottomSheetBehavior.from(translationSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
         Bundle args = new Bundle();
         Intent intent = getIntent();
         if (savedInstanceState != null) {
             madeChanges = savedInstanceState.getBoolean("MADE_CHANGES");
             lineBeginnings = savedInstanceState.getIntegerArrayList("LINE_BEGINNINGS");
-            //FIXME 
             wordEnd = BundleSparseIntArrayConverter.toSparseIntArray((Bundle) savedInstanceState.getParcelable("WORD_END"));
 
             wordIndices = savedInstanceState.getIntegerArrayList("WORD_INDICES");
@@ -192,15 +232,13 @@ public class SongActivity extends BaseActivity
         artistAndTitle = (TextView) findViewById(R.id.artist_and_title);
         artistAndTitle.setText(searchResult.artist + CommonUtils.longDash + searchResult.title);
         if (searchResult.reference != null) {
-            // already translated
+            // already in DB
             dbLoader.loadLyrics(searchResult.reference);
         } else {
             args.putString("url", searchResult.url.toString());
-            getSupportLoaderManager().initLoader(0, args, this);
+
+            getSupportLoaderManager().initLoader(0, args, mLyricsLoaderCallbacks);
         }
-        lyrics = new Lyrics(searchResult.artist, searchResult.title,
-                new UserEdit(null, searchResult.translationType,
-                searchResult.langTo, null, null, null, null, searchResult.langFrom));
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -210,6 +248,29 @@ public class SongActivity extends BaseActivity
                 }
             }
         };
+        final Spinner languageSpinner = (Spinner) findViewById(R.id.language_spinner);
+        findViewById(R.id.lang_chooser).setVisibility(View.VISIBLE);
+        final Map<String, String> nativeLanguages = new HashMap<>();
+        SharedPreferences langPreferences = getSharedPreferences(LanguageActivity.spFileName, MODE_PRIVATE);
+        for (Map.Entry<String, ?> entry : langPreferences.getAll().entrySet()) {
+            Object group = entry.getValue();
+            Locale locale = new Locale(entry.getKey());
+            if (group.equals(LanguageActivity.nativeLangGroup))
+                nativeLanguages.put(locale.getDisplayLanguage(), locale.getLanguage());
+        }
+        final ArrayList<String> readableNativeLangList = new ArrayList<>(nativeLanguages.keySet());
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item,
+                readableNativeLangList);
+        languageSpinner.setAdapter(spinnerAdapter);
+        Button confirmButton = (Button) findViewById(R.id.lang_confirm_btn);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                userEdit.translationLanguage = nativeLanguages.get(readableNativeLangList.get(languageSpinner.getSelectedItemPosition()));
+                if (userEdit.translatedText == null || userEdit.translatedText.isEmpty())
+                    getTranslation();
+            }
+        });
     }
 
 
@@ -259,54 +320,11 @@ public class SongActivity extends BaseActivity
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.edit_button: {
-                if (mAuth.getCurrentUser() == null)
-                    startActivity(new Intent(this, AuthenticationActivity.class));
-                else {
 
-                    //TODO edit
-                    //set onClickListeners
-                }
-                break;
-            }
-            case R.id.submit_gloss_btn: {
-                //TODO save to database
-                //here we'll add class songText
-                updateDB();
-                break;
-            }
-            case R.id.preview_gloss_btn: {
-
-                break;
-            }
-        }
     }
 
     private void displayNonEmptyData() {
         originalText.setText(userEdit.lyrics);
-        originalText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                BottomSheetBehavior behavior = BottomSheetBehavior.from(grammarSheet);
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                Log.d(TAG + " state", "" + behavior.getState());
-                int position = originalText.getOffsetForPosition(motionEvent.getX(), motionEvent.getY());
-                WordCoordinates coordinates = getWordCoordinatesByPosition(position);
-                Log.d(TAG + " coordinates", coordinates.lineNumber + " " +
-                        coordinates.wordIndex);
-                if (coordinates.valid()) {
-                    String translationLine = null;
-                    try {
-                        translationLine = translationLines.get(coordinates.lineNumber);
-                    } catch (IndexOutOfBoundsException e) {
-                    }
-                    translatedText.setText(translationLine);
-
-                }
-                return true;
-            }
-        });
     }
 
 
@@ -314,7 +332,6 @@ public class SongActivity extends BaseActivity
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("MADE_CHANGES", madeChanges);
         outState.putIntegerArrayList("LINE_BEGINNINGS", new ArrayList<>(lineBeginnings));
-        //FIXME 
         outState.putParcelable("WORD_END", (BundleSparseIntArrayConverter.toBundle(wordEnd)));
 
         outState.putIntegerArrayList("WORD_INDICES", new ArrayList<>(wordIndices));
@@ -338,19 +355,17 @@ public class SongActivity extends BaseActivity
         Map<String, String> indexElement = new HashMap<>();
         indexElement.put("artist", searchResult.artist);
         indexElement.put("title", searchResult.title);
-        // TODO languagesTo
         String pushId;
         if (!madeChanges) {
-            // FIXME: 19/01/2017 ref == null does not yield that lyrics are not in DB
             // if lyrics are in DB already
-            if (searchResult.reference != null || searchResult.presentInDB)
+            if (searchResult.reference != null)
                 return;
             DatabaseReference newIndexReference = index.push();
             pushId = newIndexReference.getKey();
             newIndexReference.setValue(indexElement);
             // for debug only
-            userEdit.translationLanguage = "ru";
-            newIndexReference.child("translationLanguages").child(userEdit.translationLanguage).setValue(true);
+            if (userEdit.translationLanguage != null)
+                newIndexReference.child("translationLanguages").child(userEdit.translationLanguage).setValue(true);
             edits = mDatabaseReference.child("lyrics/" + pushId + "/edits/second");
         } else {
             // REMOVE AFTER TESTING !!!
@@ -361,7 +376,6 @@ public class SongActivity extends BaseActivity
             }
             edits = searchResult.reference.child("edits/first");
         }
-        // TODO: 19/01/2017 update this when lyrics from DB are loaded 
         searchResult.presentInDB = true;
         edits.push().setValue(userEdit);
     }

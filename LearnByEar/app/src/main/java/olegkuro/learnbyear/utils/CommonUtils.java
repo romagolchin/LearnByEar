@@ -55,16 +55,18 @@ public class CommonUtils {
         return new String(builder);
     }
 
-    public static String readToString(InputStream inputStream) throws IOException{
-        int readSize;
-        byte[] buffer = new byte[8192];
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        while((readSize = inputStream.read(buffer)) >= 0) {
-            outputStream.write(buffer, 0, readSize);
+    public static @Nullable String readToString(@Nullable InputStream inputStream) throws IOException {
+        if (inputStream != null) {
+            int readSize;
+            byte[] buffer = new byte[8192];
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            while ((readSize = inputStream.read(buffer)) >= 0) {
+                outputStream.write(buffer, 0, readSize);
+            }
+            byte[] data = outputStream.toByteArray();
+            return new String(data, "UTF-8");
         }
-        byte[] data = outputStream.toByteArray();
-        return new String(data, "UTF-8");
+        return null;
     }
 
-//    public static
 }

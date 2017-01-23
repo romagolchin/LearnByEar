@@ -19,6 +19,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
     protected OnItemClickListener listener;
     protected LayoutInflater inflater;
     protected List<T> data = new ArrayList<>();
+    protected Context context;
 
     public void clear() {
         int size = this.data.size();
@@ -35,6 +36,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonAdapte
     }
 
     public CommonAdapter(Context context) {
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
 

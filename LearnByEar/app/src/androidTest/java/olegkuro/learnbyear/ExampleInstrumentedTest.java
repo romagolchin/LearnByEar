@@ -19,9 +19,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import olegkuro.learnbyear.loaders.HTMLLyricsParser;
+import olegkuro.learnbyear.loaders.TranslationLoader;
 import olegkuro.learnbyear.loaders.search.LoadResult;
 import olegkuro.learnbyear.loaders.search.SearchResult;
 import olegkuro.learnbyear.model.Lyrics;
@@ -111,5 +113,18 @@ public class ExampleInstrumentedTest {
                 Log.d("testSearch", databaseError.getMessage());
             }
         });
+    }
+
+    @Test
+    public void testTranslation() throws Exception {
+        TranslationLoader loader = new TranslationLoader(getTargetContext(), "Be or not to be\nThat is the question", "ru");
+        loader.loadInBackground();
+    }
+
+    @Test
+    public void showLocales() throws Exception {
+        for (Locale locale : Locale.getAvailableLocales()) {
+            Log.d("language", locale.getDisplayLanguage());
+        }
     }
 }

@@ -1,4 +1,6 @@
 <resources>
+    <string name="okay">OK</string>
+
     <string name="app_name">LearnByEar</string>
     <string name="facebook_app_id">1193124347407752</string>
     <string name="thanks_for_appending">Thanks for appending our lyrics base!</string>
@@ -29,5 +31,8 @@
 
     <string name="native_languages">Select your native languages</string>
     <string name="learn_languages">Select the languages you learn</string>
+
+    <string name="label_artist">Artist</string>
+    <string name="label_title">Title</string>
 
 </resources>

@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#304FFE</color>
     <color name="H1">#062803</color>
     <color name="song_text">#1b1805</color>
     <color name="md_red_50">#FFEBEE</color>

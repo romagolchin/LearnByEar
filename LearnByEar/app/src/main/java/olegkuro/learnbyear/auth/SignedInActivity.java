@@ -52,6 +52,7 @@ public class SignedInActivity extends BaseActivity implements Button.OnClickList
                                 }
                             }
                         });
+                break;
             }
         }
     }

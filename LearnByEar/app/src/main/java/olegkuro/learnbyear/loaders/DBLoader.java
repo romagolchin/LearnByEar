@@ -85,6 +85,7 @@ public class DBLoader {
                         if (translationLanguageAvailable) {
                             SearchResult result = new SearchResult(title, artist, null);
                             result.setReference(mDatabaseReference.child("lyrics/" + d.getKey()));
+
                             searchResults.add(result);
                         }
                     }
