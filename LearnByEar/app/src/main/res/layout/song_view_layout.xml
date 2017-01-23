@@ -76,26 +76,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/lang_chooser"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-
-                <Spinner
-                    android:id="@+id/language_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="10"/>
-
-                <Button
-                    android:text="@string/okay"
-                    style="@style/OrdinaryButton"
-                    android:id="@+id/lang_confirm_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-            </LinearLayout>
 
             <EditText
                 android:id="@+id/translated_text"

@@ -20,6 +20,10 @@ public class SignedInActivity extends BaseActivity implements Button.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signed_in);
+        Button signOutButton = (Button) findViewById(R.id.sign_out);
+        signOutButton.setOnClickListener(this);
+        Button deleteAccountButton = (Button) findViewById(R.id.delete_account);
+        deleteAccountButton.setOnClickListener(this);
     }
 
     @Override

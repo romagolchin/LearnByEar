@@ -149,7 +149,6 @@ public class LanguageActivity extends BaseActivity implements View.OnClickListen
         nativeLangInput.setThreshold(3);
         nativeLanguagesRecycler.setLayoutManager(new LinearLayoutManager(this));
         nativeLangAdapter = new LanguageAdapter(this);
-        // FIXME: 22/01/2017 autocompletion not working
         nativeAutoCompleteAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<>(availableLanguages.keySet()));
         nativeLangInput.setAdapter(nativeAutoCompleteAdapter);

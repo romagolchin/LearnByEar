@@ -47,7 +47,6 @@ public class TranslationLoader extends AsyncTaskLoader<LoadResult<String>> {
             type = LoadResult.ResultType.NO_NETWORK;
         else {
             try {
-                // TODO: 21/01/2017 check time of getting a token
                 HttpURLConnection connection = (HttpURLConnection) new URL(ISSUE_TOKEN_URL).openConnection();
                 connection.setRequestProperty(HEADER_KEY, HEADER_VALUE);
                 connection.setRequestMethod("POST");

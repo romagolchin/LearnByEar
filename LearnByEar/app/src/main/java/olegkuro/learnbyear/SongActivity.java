@@ -4,20 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,14 +47,6 @@ import static olegkuro.learnbyear.loaders.search.LoadResult.ResultType.OK;
 
 public class SongActivity extends BaseActivity
         implements Button.OnClickListener {
-    @IntDef({VIEW, EDIT})
-    public @interface Mode {
-    }
-
-    public static final int VIEW = 0;
-    public static final int EDIT = 1;
-    @Mode
-    private int mode = VIEW;
     private TextView artistAndTitle;
     protected LinearLayout translationSheet;
     protected EditText originalText;
@@ -239,6 +227,8 @@ public class SongActivity extends BaseActivity
 
             getSupportLoaderManager().initLoader(0, args, mLyricsLoaderCallbacks);
         }
+        if (userEdit == null)
+            userEdit = new UserEdit();
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -248,29 +238,8 @@ public class SongActivity extends BaseActivity
                 }
             }
         };
-        final Spinner languageSpinner = (Spinner) findViewById(R.id.language_spinner);
-        findViewById(R.id.lang_chooser).setVisibility(View.VISIBLE);
-        final Map<String, String> nativeLanguages = new HashMap<>();
-        SharedPreferences langPreferences = getSharedPreferences(LanguageActivity.spFileName, MODE_PRIVATE);
-        for (Map.Entry<String, ?> entry : langPreferences.getAll().entrySet()) {
-            Object group = entry.getValue();
-            Locale locale = new Locale(entry.getKey());
-            if (group.equals(LanguageActivity.nativeLangGroup))
-                nativeLanguages.put(locale.getDisplayLanguage(), locale.getLanguage());
-        }
-        final ArrayList<String> readableNativeLangList = new ArrayList<>(nativeLanguages.keySet());
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item,
-                readableNativeLangList);
-        languageSpinner.setAdapter(spinnerAdapter);
-        Button confirmButton = (Button) findViewById(R.id.lang_confirm_btn);
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                userEdit.translationLanguage = nativeLanguages.get(readableNativeLangList.get(languageSpinner.getSelectedItemPosition()));
-                if (userEdit.translatedText == null || userEdit.translatedText.isEmpty())
-                    getTranslation();
-            }
-        });
+        userEdit.translationLanguage = Locale.getDefault().getLanguage();
+        getTranslation();
     }
 
 

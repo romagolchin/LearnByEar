@@ -35,9 +35,6 @@
         <activity android:name=".auth.AuthenticationActivity" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".auth.SignedInActivity" />
-        <activity
-            android:name=".RulesActivity"
-            android:parentActivityName=".SongActivity" />
 
         <meta-data xmlns:tools="http://schemas.android.com/tools"
             android:name="io.fabric.ApiKey"

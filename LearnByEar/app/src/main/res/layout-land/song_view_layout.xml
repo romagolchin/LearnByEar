@@ -9,28 +9,6 @@
     <!-- non-scrolling top pane -->
     <!-- here we display song name and singer -->
 
-    <LinearLayout
-        android:id="@+id/lang_chooser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-
-        <Spinner
-            android:id="@+id/language_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="10" />
-
-        <Button
-            android:id="@+id/lang_confirm_btn"
-            style="@style/OrdinaryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/okay" />
-    </LinearLayout>
-
-
     <EditText
         android:id="@+id/artist"
         android:layout_width="100dp"

@@ -49,7 +49,6 @@ public class DBLoader {
         final List<SearchResult> searchResults = new ArrayList<>();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        //// FIXME: 28.12.2016
         final String[] tokens = request.toLowerCase().split("[^A-Za-z'-]");
         mDatabaseReference.child("index").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
