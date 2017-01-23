@@ -15,9 +15,8 @@
 
 ## Что используем
 * Перевод: [Microsoft Translator](https://msdn.microsoft.com/en-us/library/ff512408.aspx)
-* База данных глоссированных текстов: SQLite - ?
-* Тексты: парсинг [azlyrics.com]() - насколько это хорошо?
-* Сервер - ?
+* База данных и аутентификация: [Firebase](https://firebase.google.com)
+* Тексты: парсинг [azlyrics.com]() с помощью библиотеки [Jsoup](https://jsoup.org)
 
 #Разработчики
 Голчин Роман, Хаятов Олег, Акулов Михаил (M3237)
