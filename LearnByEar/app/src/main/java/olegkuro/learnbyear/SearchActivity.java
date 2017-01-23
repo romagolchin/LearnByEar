@@ -216,13 +216,14 @@ public class SearchActivity extends BaseActivity
                                final LoadResult<List<SearchResult>> result) {
         if (result.type == LoadResult.ResultType.OK) {
             setVisibilityOnResult();
-            adapter.setData(result.data);
-            if (searchResults == null)
+            if (searchResults == null) {
                 searchResults = new ArrayList<>();
+            }
             searchResults.addAll(result.data);
             Log.d(getClass().getSimpleName() + " getItemCount", String.valueOf(adapter.getItemCount()));
             Collections.sort(searchResults, new ResultComparator());
             searchResults = filterResults(searchResults);
+            adapter.setData(searchResults);
             loadedFromInternet = true;
         } else {
             setVisibilityOnError();

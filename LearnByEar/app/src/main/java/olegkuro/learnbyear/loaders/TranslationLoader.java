@@ -75,6 +75,8 @@ public class TranslationLoader extends AsyncTaskLoader<LoadResult<String>> {
                 type = LoadResult.ResultType.UNKNOWN_ERROR;
             }
         }
+        if (translation != null)
+            translation = translation.replaceAll("&#xD;", "");
         Log.d("translation", translation != null ? translation : "");
         return new LoadResult<>(translation, type);
     }

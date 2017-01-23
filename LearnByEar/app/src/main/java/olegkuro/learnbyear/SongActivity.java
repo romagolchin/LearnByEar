@@ -9,11 +9,11 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.SparseArrayCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,7 +48,7 @@ import static olegkuro.learnbyear.loaders.search.LoadResult.ResultType.OK;
 public class SongActivity extends BaseActivity
         implements Button.OnClickListener {
     private TextView artistAndTitle;
-    protected LinearLayout translationSheet;
+    protected NestedScrollView translationSheet;
     protected EditText originalText;
     protected EditText translatedText;
 
@@ -100,6 +100,7 @@ public class SongActivity extends BaseActivity
                         displayNonEmptyData();
                         lineBeginnings = getLineBeginnings(originalLines);
                         Collections.sort(lineBeginnings);
+                        getTranslation();
                     }
                 }
 
@@ -174,9 +175,11 @@ public class SongActivity extends BaseActivity
     }
 
     private void getTranslation() {
-        if ((userEdit.translatedText == null || userEdit.translatedText.isEmpty()) &&
-                userEdit.translationLanguage != null)
+        Log.d("test", "");
+        if ((userEdit.translatedText == null || userEdit.translatedText.isEmpty()) ) {
+            userEdit.translationLanguage = Locale.getDefault().getLanguage();
             getSupportLoaderManager().initLoader(1, null, mTranslationCallbacks);
+        }
     }
 
     private void showTranslation() {
@@ -198,8 +201,8 @@ public class SongActivity extends BaseActivity
         originalText = (EditText) findViewById(R.id.original_text);
         translatedText = (EditText) findViewById(R.id.translated_text);
         if (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-            translationSheet = (LinearLayout) findViewById(R.id.translation_sheet);
-            BottomSheetBehavior.from(translationSheet).setState(BottomSheetBehavior.STATE_HIDDEN);
+            translationSheet = (NestedScrollView) findViewById(R.id.translation_sheet);
+            BottomSheetBehavior.from(translationSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
         }
         Bundle args = new Bundle();
         Intent intent = getIntent();
@@ -219,16 +222,17 @@ public class SongActivity extends BaseActivity
         }
         artistAndTitle = (TextView) findViewById(R.id.artist_and_title);
         artistAndTitle.setText(searchResult.artist + CommonUtils.longDash + searchResult.title);
+        if (userEdit == null)
+            userEdit = new UserEdit();
         if (searchResult.reference != null) {
             // already in DB
             dbLoader.loadLyrics(searchResult.reference);
         } else {
             args.putString("url", searchResult.url.toString());
-
-            getSupportLoaderManager().initLoader(0, args, mLyricsLoaderCallbacks);
+            if (userEdit.lyrics == null) {
+                getSupportLoaderManager().initLoader(0, args, mLyricsLoaderCallbacks);
+            }
         }
-        if (userEdit == null)
-            userEdit = new UserEdit();
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -239,7 +243,6 @@ public class SongActivity extends BaseActivity
             }
         };
         userEdit.translationLanguage = Locale.getDefault().getLanguage();
-        getTranslation();
     }
 
 
